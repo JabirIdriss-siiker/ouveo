@@ -1,0 +1,155 @@
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { FaUsers, FaTools, FaCalendarCheck, FaEuroSign } from "react-icons/fa";
+import { motion } from "framer-motion";
+import Sidebar from "../components/SideBar";
+import { jwtDecode } from "jwt-decode";
+
+const ArtisanDashboard = () => {
+  const [bookings, setBookings] = useState([]);
+  const [services, setServices] = useState([]);
+  const [userInfo, setUserInfo] = useState(null);
+  const token = localStorage.getItem("token");
+
+  useEffect(() => {
+    if (token) {
+      const decoded = jwtDecode(token);
+      setUserInfo({ name: decoded.user.name, email: decoded.user.email });
+      Promise.all([
+        axios.get("http://localhost:5000/api/bookings/artisan", { headers: { "x-auth-token": token } }),
+        axios.get("http://localhost:5000/api/services/my-services", { headers: { "x-auth-token": token } })
+      ])
+        .then(([bookingsRes, servicesRes]) => {
+          setBookings(bookingsRes.data);
+          setServices(servicesRes.data);
+        })
+        .catch((error) => console.error("Erreur lors du chargement des données:", error));
+    }
+  }, [token]);
+
+  const totalRevenue = bookings
+    .filter((booking) => booking.status === "terminé")
+    .reduce((sum, booking) => sum + (booking.serviceId?.price || 0), 0);
+
+  const completedBookings = bookings.filter((booking) => booking.status === "terminé").length;
+  const pendingBookings = bookings.filter((booking) => booking.status === "en attente").length;
+
+  const chartData = Array.from({ length: 7 }, (_, i) => {
+    const date = new Date();
+    date.setDate(date.getDate() - i);
+    const bookingsOnDay = bookings.filter(
+      (booking) => new Date(booking.bookingDate).toDateString() === date.toDateString()
+    ).length;
+    return {
+      date: date.toLocaleDateString("fr-FR", { weekday: "short" }),
+      bookings: bookingsOnDay
+    };
+  }).reverse();
+
+  const fadeInUp = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+  };
+
+  return (
+    <div className="flex min-h-screen bg-light">
+      <Sidebar userInfo={userInfo} />
+      <main className="flex-1 ml-64 p-8">
+        <div className="container mx-auto">
+          <motion.header
+            initial="hidden"
+            animate="visible"
+            variants={fadeInUp}
+            className="mb-12"
+          >
+            <h2 className="section-title">Tableau de bord</h2>
+          </motion.header>
+
+          <motion.section initial="hidden" animate="visible" variants={fadeInUp}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+              <div className="card-modern p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-dark/70 mb-2">Réservations totales</p>
+                    <h3 className="text-2xl font-bold">{bookings.length}</h3>
+                  </div>
+                  <div className="p-3 bg-primary/10 rounded-full">
+                    <FaCalendarCheck className="text-primary text-xl" />
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <span className="text-green-500 text-sm">+{pendingBookings} en attente</span>
+                </div>
+              </div>
+
+              <div className="card-modern p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-dark/70 mb-2">Services actifs</p>
+                    <h3 className="text-2xl font-bold">{services.length}</h3>
+                  </div>
+                  <div className="p-3 bg-primary/10 rounded-full">
+                    <FaTools className="text-primary text-xl" />
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <span className="text-primary text-sm">{services.length} disponibles</span>
+                </div>
+              </div>
+
+              <div className="card-modern p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-dark/70 mb-2">Revenus totaux</p>
+                    <h3 className="text-2xl font-bold">{totalRevenue}€</h3>
+                  </div>
+                  <div className="p-3 bg-primary/10 rounded-full">
+                    <FaEuroSign className="text-primary text-xl" />
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <span className="text-green-500 text-sm">{completedBookings} terminés</span>
+                </div>
+              </div>
+
+              <div className="card-modern p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-dark/70 mb-2">Taux de complétion</p>
+                    <h3 className="text-2xl font-bold">
+                      {bookings.length > 0 ? Math.round((completedBookings / bookings.length) * 100) : 0}%
+                    </h3>
+                  </div>
+                  <div className="p-3 bg-primary/10 rounded-full">
+                    <FaUsers className="text-primary text-xl" />
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <span className="text-primary text-sm">{completedBookings} sur {bookings.length}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="glass-card p-6">
+              <h3 className="text-xl font-semibold mb-6 text-dark">Activité des réservations</h3>
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={chartData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(1, 5, 6, 0.1)" />
+                    <XAxis dataKey="date" stroke="rgba(1, 5, 6, 0.7)" />
+                    <YAxis stroke="rgba(1, 5, 6, 0.7)" />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="bookings" stroke="#f05742" strokeWidth={2} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </motion.section>
+        </div>
+      </main>
+    </div>
+  );
+};
+
+export default ArtisanDashboard;
