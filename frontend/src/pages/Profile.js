@@ -1,8 +1,9 @@
+// src/pages/Profile.js
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { toast } from "react-toastify";
 import { ClipLoader } from "react-spinners";
 import { FaCamera } from "react-icons/fa";
+import apiClient from "../api/apiClient"; // Adjust path based on your structure
 import Sidebar from "../components/SideBar";
 
 const Profile = () => {
@@ -22,9 +23,9 @@ const Profile = () => {
 
   useEffect(() => {
     if (token) {
-      axios
-        .get("http://localhost:5000/api/auth/me", { headers: { "x-auth-token": token } })
-        .then((response) => {
+      const fetchProfile = async () => {
+        try {
+          const response = await apiClient.get("/api/auth/me");
           const { name, email, role, specialty, location, bio, profilePicture } = response.data;
           setUser({
             name,
@@ -36,10 +37,14 @@ const Profile = () => {
             bio: bio || "",
           });
           if (profilePicture) {
-            setPreviewImage(`http://localhost:5000/${profilePicture}`);
+            setPreviewImage(`${process.env.REACT_APP_API_URL}/${profilePicture}`);
           }
-        })
-        .catch((error) => console.error("Erreur lors du chargement du profil:", error));
+        } catch (error) {
+          console.error("Erreur lors du chargement du profil:", error);
+          toast.error("Erreur lors du chargement du profil");
+        }
+      };
+      fetchProfile();
     }
   }, [token]);
 
@@ -72,19 +77,18 @@ const Profile = () => {
     }
 
     try {
-      const response = await axios.put("http://localhost:5000/api/auth/me", formData, {
+      const response = await apiClient.put("/api/auth/me", formData, {
         headers: {
-          "x-auth-token": token,
           "Content-Type": "multipart/form-data",
         },
       });
       setUser({ ...response.data, password: "" }); // Update state with server response
       if (response.data.profilePicture) {
-        setPreviewImage(`http://localhost:5000/${response.data.profilePicture}`);
+        setPreviewImage(`${process.env.REACT_APP_API_URL}/${response.data.profilePicture}`);
       }
       toast.success("Profil mis à jour avec succès!");
     } catch (error) {
-      toast.error("Erreur lors de la mise à jour du profil");
+      toast.error(error.response?.data?.message || "Erreur lors de la mise à jour du profil");
       console.error(error);
     } finally {
       setLoading(false);
@@ -92,118 +96,117 @@ const Profile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-light py-12 px-4 sm:px-8 font-poppins">
+    <div className="flex min-h-screen bg-light font-anton text-dark">
       <Sidebar userInfo={user} />
-      <div className="container mx-auto max-w-full sm:max-w-2xl">
-        <h2 className="section-title text-center">
-          Mon Profil
-        </h2>
-        
-        <form onSubmit={handleUpdate} className="card-modern p-6 sm:p-8">
-          {/* Profile Picture */}
-          <div className="flex justify-center mb-6">
-            <div className="relative">
-              <img
-                src={previewImage || "https://via.placeholder.com/120"}
-                alt="Profile"
-                className="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-light shadow-md"
-              />
-              <label
-                htmlFor="profilePicture"
-                className="absolute bottom-0 right-0 bg-primary text-light p-2 rounded-full cursor-pointer hover:bg-primary-dark transition-all duration-300"
-              >
-                <FaCamera />
-                <input
-                  type="file"
-                  id="profilePicture"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="hidden"
+      <div className="flex-1 ml-64 py-12 px-4 sm:px-8">
+        <div className="container mx-auto max-w-full sm:max-w-2xl">
+          <h2 className="section-title text-center">Mon Profil</h2>
+          <form onSubmit={handleUpdate} className="card-modern p-6 sm:p-8">
+            {/* Profile Picture */}
+            <div className="flex justify-center mb-6">
+              <div className="relative">
+                <img
+                  src={previewImage || "https://via.placeholder.com/120"}
+                  alt="Profile"
+                  className="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-light shadow-md"
                 />
-              </label>
+                <label
+                  htmlFor="profilePicture"
+                  className="absolute bottom-0 right-0 bg-primary text-light p-2 rounded-full cursor-pointer hover:bg-primary-dark transition-all duration-300"
+                >
+                  <FaCamera />
+                  <input
+                    type="file"
+                    id="profilePicture"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="hidden"
+                  />
+                </label>
+              </div>
             </div>
-          </div>
 
-          {/* Common Fields */}
-          <div className="space-y-4">
-            <div className="form-group">
-              <input
-                type="text"
-                name="name"
-                placeholder="Nom"
-                value={user.name}
-                onChange={handleInputChange}
-                className="input-modern"
-              />
-            </div>
-            <div className="form-group">
-              <input
-                type="email"
-                name="email"
-                placeholder="Email"
-                value={user.email}
-                onChange={handleInputChange}
-                className="input-modern"
-              />
-            </div>
-            <div className="form-group">
-              <input
-                type="password"
-                name="password"
-                placeholder="Nouveau mot de passe (optionnel)"
-                value={user.password}
-                onChange={handleInputChange}
-                className="input-modern"
-              />
-            </div>
-          </div>
-
-          {/* Artisan-Specific Fields */}
-          {user.role === "artisan" && (
-            <div className="mt-6 space-y-4">
-              <h3 className="text-lg sm:text-xl font-semibold text-dark">Informations Artisan</h3>
+            {/* Common Fields */}
+            <div className="space-y-4">
               <div className="form-group">
                 <input
                   type="text"
-                  name="specialty"
-                  placeholder="Spécialité (ex. Plomberie)"
-                  value={user.specialty}
+                  name="name"
+                  placeholder="Nom"
+                  value={user.name}
                   onChange={handleInputChange}
                   className="input-modern"
                 />
               </div>
               <div className="form-group">
                 <input
-                  type="text"
-                  name="location"
-                  placeholder="Localisation (ex. Paris, France)"
-                  value={user.location}
+                  type="email"
+                  name="email"
+                  placeholder="Email"
+                  value={user.email}
                   onChange={handleInputChange}
                   className="input-modern"
                 />
               </div>
               <div className="form-group">
-                <textarea
-                  name="bio"
-                  placeholder="Bio (parlez de vous)"
-                  value={user.bio}
+                <input
+                  type="password"
+                  name="password"
+                  placeholder="Nouveau mot de passe (optionnel)"
+                  value={user.password}
                   onChange={handleInputChange}
                   className="input-modern"
-                  rows="4"
                 />
               </div>
             </div>
-          )}
 
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="btn-primary w-full mt-6 flex justify-center items-center"
-          >
-            {loading ? <ClipLoader size={20} color="#f9f8f8" /> : "Mettre à jour"}
-          </button>
-        </form>
+            {/* Artisan-Specific Fields */}
+            {user.role === "artisan" && (
+              <div className="mt-6 space-y-4">
+                <h3 className="text-lg sm:text-xl font-semibold text-dark font-anton">Informations Artisan</h3>
+                <div className="form-group">
+                  <input
+                    type="text"
+                    name="specialty"
+                    placeholder="Spécialité (ex. Plomberie)"
+                    value={user.specialty}
+                    onChange={handleInputChange}
+                    className="input-modern"
+                  />
+                </div>
+                <div className="form-group">
+                  <input
+                    type="text"
+                    name="location"
+                    placeholder="Localisation (ex. Paris, France)"
+                    value={user.location}
+                    onChange={handleInputChange}
+                    className="input-modern"
+                  />
+                </div>
+                <div className="form-group">
+                  <textarea
+                    name="bio"
+                    placeholder="Bio (parlez de vous)"
+                    value={user.bio}
+                    onChange={handleInputChange}
+                    className="input-modern"
+                    rows="4"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn-primary w-full mt-6 flex justify-center items-center"
+            >
+              {loading ? <ClipLoader size={20} color="#f9f8f8" /> : "Mettre à jour"}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );

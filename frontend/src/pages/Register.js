@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { ClipLoader } from "react-spinners";
+import apiClient from "../api/apiClient"
 
 const Register = () => {
   const [name, setName] = useState("");
@@ -18,7 +19,7 @@ const Register = () => {
     }
     setLoading(true);
     try {
-      const response = await axios.post("http://localhost:5000/api/auth/register", {
+      const response = await apiClient.post("/api/auth/register", {
         name,
         email,
         password,

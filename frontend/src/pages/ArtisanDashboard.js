@@ -1,11 +1,11 @@
+// src/pages/ArtisanDashboard.js
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { FaUsers, FaTools, FaCalendarCheck, FaEuroSign } from "react-icons/fa";
 import { motion } from "framer-motion";
-import Sidebar from "../components/SideBar";
+import Sidebar from "../components/SideBar"; // Fixed typo in import
 import { jwtDecode } from "jwt-decode";
-import apiClient from "../api/apiClient"
+import apiClient from "../api/apiClient"; // Adjust path based on your structure
 
 const ArtisanDashboard = () => {
   const [bookings, setBookings] = useState([]);
@@ -17,15 +17,20 @@ const ArtisanDashboard = () => {
     if (token) {
       const decoded = jwtDecode(token);
       setUserInfo({ name: decoded.user.name, email: decoded.user.email });
-      Promise.all([
-        axios.get("http://localhost:5000/api/bookings/artisan", { headers: { "x-auth-token": token } }),
-        axios.get("http://localhost:5000/api/services/my-services", { headers: { "x-auth-token": token } })
-      ])
-        .then(([bookingsRes, servicesRes]) => {
-          setBookings(bookingsRes.data);
-          setServices(servicesRes.data);
-        })
-        .catch((error) => console.error("Erreur lors du chargement des données:", error));
+
+      const fetchData = async () => {
+        try {
+          const [bookingsRes, servicesRes] = await Promise.all([
+            apiClient.get("/api/bookings/artisan"),
+            apiClient.get("/api/services/my-services"),
+          ]);
+          setBookings(bookingsRes.data || []);
+          setServices(servicesRes.data || []);
+        } catch (error) {
+          console.error("Erreur lors du chargement des données:", error);
+        }
+      };
+      fetchData();
     }
   }, [token]);
 
@@ -44,26 +49,21 @@ const ArtisanDashboard = () => {
     ).length;
     return {
       date: date.toLocaleDateString("fr-FR", { weekday: "short" }),
-      bookings: bookingsOnDay
+      bookings: bookingsOnDay,
     };
   }).reverse();
 
   const fadeInUp = {
     hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
   };
 
   return (
-    <div className="flex min-h-screen bg-light">
+    <div className="flex min-h-screen bg-light font-anton text-dark">
       <Sidebar userInfo={userInfo} />
       <main className="flex-1 ml-64 p-8">
         <div className="container mx-auto">
-          <motion.header
-            initial="hidden"
-            animate="visible"
-            variants={fadeInUp}
-            className="mb-12"
-          >
+          <motion.header initial="hidden" animate="visible" variants={fadeInUp} className="mb-12">
             <h2 className="section-title">Tableau de bord</h2>
           </motion.header>
 
@@ -72,7 +72,7 @@ const ArtisanDashboard = () => {
               <div className="card-modern p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-dark/70 mb-2">Réservations totales</p>
+                    <p className="text-dark/70 mb-2 font-poppins">Réservations totales</p>
                     <h3 className="text-2xl font-bold">{bookings.length}</h3>
                   </div>
                   <div className="p-3 bg-primary/10 rounded-full">
@@ -80,14 +80,14 @@ const ArtisanDashboard = () => {
                   </div>
                 </div>
                 <div className="mt-4">
-                  <span className="text-green-500 text-sm">+{pendingBookings} en attente</span>
+                  <span className="text-green-500 text-sm font-poppins">+{pendingBookings} en attente</span>
                 </div>
               </div>
 
               <div className="card-modern p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-dark/70 mb-2">Services actifs</p>
+                    <p className="text-dark/70 mb-2 font-poppins">Services actifs</p>
                     <h3 className="text-2xl font-bold">{services.length}</h3>
                   </div>
                   <div className="p-3 bg-primary/10 rounded-full">
@@ -95,14 +95,14 @@ const ArtisanDashboard = () => {
                   </div>
                 </div>
                 <div className="mt-4">
-                  <span className="text-primary text-sm">{services.length} disponibles</span>
+                  <span className="text-primary text-sm font-poppins">{services.length} disponibles</span>
                 </div>
               </div>
 
               <div className="card-modern p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-dark/70 mb-2">Revenus totaux</p>
+                    <p className="text-dark/70 mb-2 font-poppins">Revenus totaux</p>
                     <h3 className="text-2xl font-bold">{totalRevenue}€</h3>
                   </div>
                   <div className="p-3 bg-primary/10 rounded-full">
@@ -110,14 +110,14 @@ const ArtisanDashboard = () => {
                   </div>
                 </div>
                 <div className="mt-4">
-                  <span className="text-green-500 text-sm">{completedBookings} terminés</span>
+                  <span className="text-green-500 text-sm font-poppins">{completedBookings} terminés</span>
                 </div>
               </div>
 
               <div className="card-modern p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-dark/70 mb-2">Taux de complétion</p>
+                    <p className="text-dark/70 mb-2 font-poppins">Taux de complétion</p>
                     <h3 className="text-2xl font-bold">
                       {bookings.length > 0 ? Math.round((completedBookings / bookings.length) * 100) : 0}%
                     </h3>
@@ -127,7 +127,9 @@ const ArtisanDashboard = () => {
                   </div>
                 </div>
                 <div className="mt-4">
-                  <span className="text-primary text-sm">{completedBookings} sur {bookings.length}</span>
+                  <span className="text-primary text-sm font-poppins">
+                    {completedBookings} sur {bookings.length}
+                  </span>
                 </div>
               </div>
             </div>
@@ -141,7 +143,7 @@ const ArtisanDashboard = () => {
                     <XAxis dataKey="date" stroke="rgba(1, 5, 6, 0.7)" />
                     <YAxis stroke="rgba(1, 5, 6, 0.7)" />
                     <Tooltip />
-                    <Line type="monotone" dataKey="bookings" stroke="#f05742" strokeWidth={2} />
+                    <Line type="monotone" dataKey="bookings" stroke="var(--primary)" strokeWidth={2} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>

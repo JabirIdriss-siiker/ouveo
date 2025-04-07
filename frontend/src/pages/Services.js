@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
 import { FaStar, FaTools, FaMapMarkerAlt } from "react-icons/fa";
 import { motion } from "framer-motion";
+import apiClient from "../api/apiClient"
 
 const Services = () => {
   const [artisans, setArtisans] = useState([]);
@@ -12,7 +13,7 @@ const Services = () => {
   useEffect(() => {
     const fetchArtisans = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/auth/artisans");
+        const response = await apiClient.get("/api/auth/artisans");
         setArtisans(response.data);
       } catch (error) {
         console.error("Erreur lors du chargement des artisans:", error);

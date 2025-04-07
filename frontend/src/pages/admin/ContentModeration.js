@@ -1,10 +1,11 @@
+// src/pages/admin/ContentModeration.js
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { ClipLoader } from "react-spinners";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
 import AdminSidebar from "../../components/admin/AdminSidebar";
 import { jwtDecode } from "jwt-decode";
+import apiClient from "../../api/apiClient"; // Adjust path based on your structure
 
 const ContentModeration = () => {
   const [reports, setReports] = useState([]);
@@ -24,12 +25,10 @@ const ContentModeration = () => {
   const fetchReports = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("http://localhost:5000/api/admin/reports", {
-        headers: { "x-auth-token": token },
-      });
-      setReports(response.data);
+      const response = await apiClient.get("/api/admin/reports");
+      setReports(response.data || []);
     } catch (error) {
-      console.error("Error fetching reports:", error);
+      console.error("Erreur lors du chargement des signalements:", error);
       toast.error("Erreur lors du chargement des signalements");
     } finally {
       setLoading(false);
@@ -38,25 +37,24 @@ const ContentModeration = () => {
 
   const handleReport = async (reportId, status, moderatorNotes = "") => {
     try {
-      await axios.put(
-        "http://localhost:5000/api/admin/reports",
-        { reportId, status, moderatorNotes },
-        { headers: { "x-auth-token": token } }
-      );
+      await apiClient.put("/api/admin/reports", { reportId, status, moderatorNotes });
       setReports(reports.filter((report) => report._id !== reportId));
       toast.success("Signalement traité avec succès");
     } catch (error) {
-      console.error("Error handling report:", error);
-      toast.error("Erreur lors du traitement du signalement");
+      console.error("Erreur lors du traitement du signalement:", error);
+      toast.error(error.response?.data?.message || "Erreur lors du traitement du signalement");
     }
   };
 
-  const filteredReports = reports.filter(report => {
+  const filteredReports = reports.filter((report) => {
     if (filter === "all") return true;
     return report.status === filter;
   });
 
-  const fadeIn = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8 } } };
+  const fadeIn = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.8 } },
+  };
 
   return (
     <div className="flex min-h-screen bg-light font-anton text-dark">
@@ -76,10 +74,7 @@ const ContentModeration = () => {
                 <option value="resolved">Résolus</option>
                 <option value="dismissed">Rejetés</option>
               </select>
-              <button
-                onClick={fetchReports}
-                className="btn-primary px-6"
-              >
+              <button onClick={fetchReports} className="btn-primary px-6">
                 Rafraîchir
               </button>
             </div>
@@ -91,14 +86,13 @@ const ContentModeration = () => {
             </div>
           ) : filteredReports.length === 0 ? (
             <p className="text-center text-dark/70 font-poppins text-lg">
-              Aucun signalement {filter !== "all" ? "en attente" : ""}
+              Aucun signalement {filter !== "all" ? filter : ""}
             </p>
           ) : (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {filteredReports.map((report) => (
                 <motion.div
                   key={report._id}
-                  
                   initial="hidden"
                   animate="visible"
                   variants={fadeIn}
@@ -109,24 +103,36 @@ const ContentModeration = () => {
                       <h3 className="text-xl font-semibold">
                         Signalement #{report._id.slice(-6)}
                       </h3>
-                      <span className={`badge ${
-                        report.status === "pending" ? "bg-yellow-100 text-yellow-800" :
-                        report.status === "resolved" ? "bg-green-100 text-green-800" :
-                        "bg-red-100 text-red-800"
-                      }`}>
+                      <span
+                        className={`badge font-poppins ${
+                          report.status === "pending"
+                            ? "bg-yellow-100 text-yellow-800"
+                            : report.status === "resolved"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
                         {report.status}
                       </span>
                     </div>
-                    <p className="text-dark/70 text-sm">
+                    <p className="text-dark/70 text-sm font-poppins">
                       {new Date(report.createdAt).toLocaleString()}
                     </p>
                   </div>
 
-                  <div className="space-y-2 mb-6">
-                    <p><strong>Type:</strong> {report.reportedItem.type}</p>
-                    <p><strong>Raison:</strong> {report.reason}</p>
-                    <p><strong>Description:</strong> {report.description}</p>
-                    <p><strong>Signalé par:</strong> {report.reportedBy.name}</p>
+                  <div className="space-y-2 mb-6 font-poppins">
+                    <p>
+                      <strong>Type:</strong> {report.reportedItem?.type || "Non spécifié"}
+                    </p>
+                    <p>
+                      <strong>Raison:</strong> {report.reason}
+                    </p>
+                    <p>
+                      <strong>Description:</strong> {report.description}
+                    </p>
+                    <p>
+                      <strong>Signalé par:</strong> {report.reportedBy?.name || "Utilisateur inconnu"}
+                    </p>
                   </div>
 
                   {report.status === "pending" && (
@@ -139,21 +145,25 @@ const ContentModeration = () => {
                       />
                       <div className="flex gap-4">
                         <button
-                          onClick={() => handleReport(
-                            report._id,
-                            "resolved",
-                            document.getElementById(`notes-${report._id}`).value
-                          )}
+                          onClick={() =>
+                            handleReport(
+                              report._id,
+                              "resolved",
+                              document.getElementById(`notes-${report._id}`).value
+                            )
+                          }
                           className="btn-primary flex-1 bg-green-500 hover:bg-green-600"
                         >
                           Résoudre
                         </button>
                         <button
-                          onClick={() => handleReport(
-                            report._id,
-                            "dismissed",
-                            document.getElementById(`notes-${report._id}`).value
-                          )}
+                          onClick={() =>
+                            handleReport(
+                              report._id,
+                              "dismissed",
+                              document.getElementById(`notes-${report._id}`).value
+                            )
+                          }
                           className="btn-primary flex-1 bg-red-500 hover:bg-red-600"
                         >
                           Rejeter
@@ -164,8 +174,8 @@ const ContentModeration = () => {
 
                   {report.status !== "pending" && report.moderatorNotes && (
                     <div className="mt-4 p-3 bg-light-soft rounded-xl">
-                      <p className="font-semibold">Notes du modérateur:</p>
-                      <p className="text-dark/70">{report.moderatorNotes}</p>
+                      <p className="font-semibold font-poppins">Notes du modérateur:</p>
+                      <p className="text-dark/70 font-poppins">{report.moderatorNotes}</p>
                     </div>
                   )}
                 </motion.div>

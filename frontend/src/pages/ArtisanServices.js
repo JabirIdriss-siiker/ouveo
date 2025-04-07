@@ -1,11 +1,11 @@
+// src/pages/ArtisanServices.js
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
+import apiClient from "../api/apiClient"; // Adjust path based on your structure
 import ServiceCard from "../components/ServiceCard";
 import { ClipLoader } from "react-spinners";
 import { FaStar, FaTools, FaMapMarkerAlt } from "react-icons/fa";
 import { motion } from "framer-motion";
-import apiClient from "../api/apiClient"
 
 const ArtisanServices = () => {
   const { id } = useParams();
@@ -15,21 +15,24 @@ const ArtisanServices = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([
-      axios.get(`http://localhost:5000/api/services/artisan/${id}`),
-      axios.get(`http://localhost:5000/api/auth/artisans/${id}`),
-      axios.get(`http://localhost:5000/api/portfolio/artisan/${id}`),
-    ])
-      .then(([servicesRes, artisanRes, portfolioRes]) => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const [servicesRes, artisanRes, portfolioRes] = await Promise.all([
+          apiClient.get(`/api/services/artisan/${id}`),
+          apiClient.get(`/api/auth/artisans/${id}`),
+          apiClient.get(`/api/portfolio/artisan/${id}`),
+        ]);
         setArtisan(artisanRes.data);
-        setServices(servicesRes.data);
+        setServices(servicesRes.data || []);
         setPortfolio(portfolioRes.data || []);
-        setLoading(false);
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error("Erreur lors du chargement:", error);
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+    fetchData();
   }, [id]);
 
   // Animation Variants
@@ -41,13 +44,13 @@ const ArtisanServices = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex justify-center items-center bg-light">
-        <ClipLoader size={50} color="#f05742" />
+        <ClipLoader size={50} color="var(--primary)" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-light py-16 px-4 sm:px-8 font-poppins overflow-x-hidden">
+    <div className="min-h-screen bg-light py-16 px-4 sm:px-8 font-anton text-dark overflow-x-hidden">
       <div className="container mx-auto px-4 sm:px-8">
         {/* Artisan Profile */}
         {artisan ? (
@@ -65,33 +68,31 @@ const ArtisanServices = () => {
               <img
                 src={
                   artisan.profilePicture
-                    ? `http://localhost:5000/${artisan.profilePicture}`
+                    ? `${process.env.REACT_APP_API_URL}/${artisan.profilePicture}`
                     : `https://ui-avatars.com/api/?name=${artisan.name}&background=random`
                 }
                 alt={artisan.name}
                 className="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-light shadow-md animate-float"
               />
               <div className="text-center sm:text-left space-y-3">
-                <h2 className="text-3xl sm:text-4xl font-extrabold text">
-                  {artisan.name}
-                </h2>
-                <p className="text-dark/70 text-base sm:text-lg flex items-center justify-center sm:justify-start">
+                <h2 className="text-3xl sm:text-4xl font-extrabold text-dark">{artisan.name}</h2>
+                <p className="text-dark/70 text-base sm:text-lg flex items-center justify-center sm:justify-start font-poppins">
                   <FaTools className="mr-2 text-primary" />
                   {artisan.specialty || "Artisan polyvalent"}
                 </p>
-                <p className="text-dark/70 text-base sm:text-lg flex items-center justify-center sm:justify-start">
+                <p className="text-dark/70 text-base sm:text-lg flex items-center justify-center sm:justify-start font-poppins">
                   <FaMapMarkerAlt className="mr-2 text-dark" />
                   {artisan.location || "Localisation non spécifiée"}
                 </p>
-                <p className="text-dark/70 text-base sm:text-lg max-w-2xl">
+                <p className="text-dark/70 text-base sm:text-lg max-w-2xl font-poppins">
                   {artisan.bio || "Un artisan passionné prêt à vous aider."}
                 </p>
-                <p className="text-primary text-base sm:text-lg flex items-center justify-center sm:justify-start">
+                <p className="text-primary text-base sm:text-lg flex items-center justify-center sm:justify-start font-poppins">
                   <FaStar className="mr-2" />
                   {artisan.rating ? `${artisan.rating}/5` : "Non évalué"}
                   {artisan.ratingCount && ` (${artisan.ratingCount} avis)`}
                 </p>
-                <p className="text-dark/70 text-base sm:text-lg">
+                <p className="text-dark/70 text-base sm:text-lg font-poppins">
                   <strong className="text-dark">Services:</strong> {services.length}
                 </p>
               </div>
@@ -102,7 +103,7 @@ const ArtisanServices = () => {
             initial="hidden"
             animate="visible"
             variants={fadeInUp}
-            className="text-center text-dark/70 text-lg sm:text-xl font-medium mb-12"
+            className="text-center text-dark/70 text-lg sm:text-xl font-medium mb-12 font-poppins"
           >
             Artisan non trouvé.
           </motion.p>
@@ -133,7 +134,7 @@ const ArtisanServices = () => {
                 {item.image && (
                   <div className="relative overflow-hidden rounded-t-3xl">
                     <img
-                      src={`http://localhost:5000/${item.image}`}
+                      src={`${process.env.REACT_APP_API_URL}/${item.image}`}
                       alt={item.title}
                       className="w-full h-48 sm:h-56 object-cover transition-transform duration-300 group-hover:scale-105"
                     />
@@ -144,7 +145,7 @@ const ArtisanServices = () => {
                   <h4 className="text-lg sm:text-xl font-semibold text-dark group-hover:text-primary transition-all duration-300">
                     {item.title}
                   </h4>
-                  <p className="text-dark/70 text-sm sm:text-base line-clamp-3 mt-2">
+                  <p className="text-dark/70 text-sm sm:text-base line-clamp-3 mt-2 font-poppins">
                     {item.description}
                   </p>
                 </div>
@@ -155,7 +156,7 @@ const ArtisanServices = () => {
               initial="hidden"
               whileInView="visible"
               variants={fadeInUp}
-              className="text-center text-dark/70 col-span-full text-base sm:text-lg font-medium"
+              className="text-center text-dark/70 col-span-full text-base sm:text-lg font-medium font-poppins"
             >
               Cet artisan n'a pas encore ajouté de projets à son portfolio.
             </motion.p>
@@ -191,7 +192,7 @@ const ArtisanServices = () => {
               initial="hidden"
               whileInView="visible"
               variants={fadeInUp}
-              className="text-center text-dark/70 col-span-full text-base sm:text-lg font-medium"
+              className="text-center text-dark/70 col-span-full text-base sm:text-lg font-medium font-poppins"
             >
               Cet artisan n'a pas encore ajouté de services.
             </motion.p>

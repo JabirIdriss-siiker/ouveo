@@ -1,5 +1,5 @@
+// src/pages/admin/AdminDashboard.js
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { motion } from "framer-motion";
 import { ClipLoader } from "react-spinners";
 import {
@@ -12,10 +12,11 @@ import {
   ResponsiveContainer,
   BarChart,
   Bar,
-  Legend
+  Legend,
 } from "recharts";
 import AdminSidebar from "../../components/admin/AdminSidebar";
 import { jwtDecode } from "jwt-decode";
+import apiClient from "../../api/apiClient"; // Adjust path based on your structure
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState(null);
@@ -32,13 +33,12 @@ const AdminDashboard = () => {
   }, [token]);
 
   const fetchDashboardStats = async () => {
+    setLoading(true);
     try {
-      const response = await axios.get("http://localhost:5000/api/admin/dashboard-stats", {
-        headers: { "x-auth-token": token },
-      });
-      setStats(response.data);
+      const response = await apiClient.get("/api/admin/dashboard-stats");
+      setStats(response.data || {});
     } catch (error) {
-      console.error("Error fetching dashboard stats:", error);
+      console.error("Erreur lors du chargement des statistiques:", error);
     } finally {
       setLoading(false);
     }
@@ -54,14 +54,14 @@ const AdminDashboard = () => {
       <div className="flex min-h-screen">
         <AdminSidebar userInfo={userInfo} />
         <div className="flex-1 ml-64 p-8 flex justify-center items-center">
-          <ClipLoader size={40} color="#f05742" />
+          <ClipLoader size={40} color="var(--primary)" />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-light">
+    <div className="flex min-h-screen bg-light font-anton text-dark">
       <AdminSidebar userInfo={userInfo} />
       <div className="flex-1 ml-64 p-8">
         <div className="container mx-auto">
@@ -109,7 +109,7 @@ const AdminDashboard = () => {
               >
                 <div className={`w-12 h-12 ${stat.color} rounded-full mb-4`} />
                 <h3 className="text-xl font-semibold text-dark">{stat.title}</h3>
-                <p className="text-3xl font-bold text-primary mt-2">{stat.value}</p>
+                <p className="text-3xl font-bold text-primary mt-2 font-poppins">{stat.value}</p>
               </div>
             ))}
           </motion.div>
@@ -138,8 +138,8 @@ const AdminDashboard = () => {
                   <Area
                     type="monotone"
                     dataKey="count"
-                    stroke="#f05742"
-                    fill="#f05742"
+                    stroke="var(--primary)"
+                    fill="var(--primary)"
                     fillOpacity={0.2}
                   />
                 </AreaChart>
@@ -163,11 +163,16 @@ const AdminDashboard = () => {
                 >
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="_id" />
-                  <YAxis yAxisId="left" orientation="left" stroke="#f05742" />
+                  <YAxis yAxisId="left" orientation="left" stroke="var(--primary)" />
                   <YAxis yAxisId="right" orientation="right" stroke="#82ca9d" />
                   <Tooltip />
                   <Legend />
-                  <Bar yAxisId="left" dataKey="bookings" fill="#f05742" name="Réservations" />
+                  <Bar
+                    yAxisId="left"
+                    dataKey="bookings"
+                    fill="var(--primary)"
+                    name="Réservations"
+                  />
                   <Bar yAxisId="right" dataKey="revenue" fill="#82ca9d" name="Revenus (€)" />
                 </BarChart>
               </ResponsiveContainer>

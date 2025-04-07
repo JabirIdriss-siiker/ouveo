@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { FaArrowRight, FaHammer, FaLightbulb, FaHandshake } from "react-icons/fa";
 import apiClient from "../api/apiClient"
+
 const Home = () => {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);

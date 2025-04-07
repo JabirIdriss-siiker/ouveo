@@ -1,5 +1,5 @@
+// src/pages/admin/RevenueTracking.js
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { ClipLoader } from "react-spinners";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
@@ -13,16 +13,17 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
-  ResponsiveContainer
+  ResponsiveContainer,
 } from "recharts";
+import apiClient from "../../api/apiClient"; // Adjust path based on your structure
 
 const RevenueTracking = () => {
   const [revenueData, setRevenueData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userInfo, setUserInfo] = useState(null);
   const [dateRange, setDateRange] = useState({
-    startDate: new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString().split('T')[0],
-    endDate: new Date().toISOString().split('T')[0]
+    startDate: new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString().split("T")[0],
+    endDate: new Date().toISOString().split("T")[0],
   });
   const token = localStorage.getItem("token");
 
@@ -37,13 +38,12 @@ const RevenueTracking = () => {
   const fetchRevenueData = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(
-        `http://localhost:5000/api/admin/revenue?startDate=${dateRange.startDate}&endDate=${dateRange.endDate}`,
-        { headers: { "x-auth-token": token } }
+      const response = await apiClient.get(
+        `/api/admin/revenue?startDate=${dateRange.startDate}&endDate=${dateRange.endDate}`
       );
-      setRevenueData(response.data);
+      setRevenueData(response.data || []);
     } catch (error) {
-      console.error("Error fetching revenue data:", error);
+      console.error("Erreur lors du chargement des données de revenus:", error);
       toast.error("Erreur lors du chargement des données de revenus");
     } finally {
       setLoading(false);
@@ -62,7 +62,10 @@ const RevenueTracking = () => {
     return revenueData.reduce((sum, day) => sum + day.bookingsCount, 0);
   };
 
-  const fadeIn = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8 } } };
+  const fadeIn = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.8 } },
+  };
 
   return (
     <div className="flex min-h-screen bg-light font-anton text-dark">
@@ -87,10 +90,7 @@ const RevenueTracking = () => {
                   className="input-modern"
                 />
               </div>
-              <button
-                onClick={fetchRevenueData}
-                className="btn-primary px-6"
-              >
+              <button onClick={fetchRevenueData} className="btn-primary px-6">
                 Rafraîchir
               </button>
             </div>
@@ -107,17 +107,17 @@ const RevenueTracking = () => {
                 <div className="glass-card p-6">
                   <h3 className="text-xl font-semibold mb-2">Revenu Total</h3>
                   <p className="text-3xl text-primary">{calculateTotalRevenue().toFixed(2)}€</p>
-                  <p className="text-dark/70 text-sm mt-2">Pour la période sélectionnée</p>
+                  <p className="text-dark/70 text-sm mt-2 font-poppins">Pour la période sélectionnée</p>
                 </div>
                 <div className="glass-card p-6">
                   <h3 className="text-xl font-semibold mb-2">Revenu Moyen / Jour</h3>
                   <p className="text-3xl text-primary">{calculateAverageRevenue().toFixed(2)}€</p>
-                  <p className="text-dark/70 text-sm mt-2">Pour la période sélectionnée</p>
+                  <p className="text-dark/70 text-sm mt-2 font-poppins">Pour la période sélectionnée</p>
                 </div>
                 <div className="glass-card p-6">
                   <h3 className="text-xl font-semibold mb-2">Total Réservations</h3>
                   <p className="text-3xl text-primary">{calculateTotalBookings()}</p>
-                  <p className="text-dark/70 text-sm mt-2">Pour la période sélectionnée</p>
+                  <p className="text-dark/70 text-sm mt-2 font-poppins">Pour la période sélectionnée</p>
                 </div>
               </div>
 
@@ -126,10 +126,7 @@ const RevenueTracking = () => {
                 <h3 className="text-xl font-semibold mb-6">Évolution des Revenus</h3>
                 <div className="h-96">
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart
-                      data={revenueData}
-                      margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                    >
+                    <LineChart data={revenueData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis
                         dataKey="_id"
@@ -151,7 +148,7 @@ const RevenueTracking = () => {
                         yAxisId="left"
                         type="monotone"
                         dataKey="totalRevenue"
-                        stroke="#f05742"
+                        stroke="var(--primary)"
                         name="Revenus (€)"
                       />
                       <Line
@@ -182,12 +179,12 @@ const RevenueTracking = () => {
                     <tbody>
                       {revenueData.map((day, index) => (
                         <tr key={index} className="table-cell hover:bg-light-soft">
-                          <td className="px-6 py-4">
+                          <td className="px-6 py-4 font-poppins">
                             {new Date(day._id.year, day._id.month - 1, day._id.day).toLocaleDateString()}
                           </td>
-                          <td className="px-6 py-4">{day.bookingsCount}</td>
-                          <td className="px-6 py-4">{day.totalRevenue.toFixed(2)}€</td>
-                          <td className="px-6 py-4">
+                          <td className="px-6 py-4 font-poppins">{day.bookingsCount}</td>
+                          <td className="px-6 py-4 font-poppins">{day.totalRevenue.toFixed(2)}€</td>
+                          <td className="px-6 py-4 font-poppins">
                             {day.bookingsCount > 0
                               ? (day.totalRevenue / day.bookingsCount).toFixed(2)
                               : "0.00"}
