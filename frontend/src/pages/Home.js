@@ -5,23 +5,25 @@ import { ClipLoader } from "react-spinners";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { FaArrowRight, FaHammer, FaLightbulb, FaHandshake } from "react-icons/fa";
-
+import apiClient from "../api/apiClient"
 const Home = () => {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios
-      .get("http://localhost:5000/api/services")
-      .then((response) => {
+    const fetchServices = async () => {
+      setLoading(true);
+      try {
+        const response = await apiClient.get("/api/services");
         setServices(response.data || []);
-        setLoading(false);
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error("Erreur lors du chargement des services:", error);
         setServices([]);
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+    fetchServices();
   }, []);
 
   // Animation Variants
