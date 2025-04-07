@@ -1,0 +1,57 @@
+# Node modules
+node_modules/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# dotenv environment variables
+.env
+.env.*   # In case you have .env.development, .env.local, etc.
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Build outputs
+/dist
+/build
+
+# Dependency directories
+frontend/node_modules/
+backend/node_modules/
+
+# IDE/Editor settings
+.vscode/
+.idea/
+
+# Coverage results
+coverage/
+
+# Optional: Next.js / React cache
+.next/
+.cache/
+.eslintcache
+
+# Optional: PM2 logs
+pids/
+*.pid
+
+# MongoDB dump (if you export database locally)
+dump/
+
+# Optional: Docker-related
+docker-compose.override.yml
+*.local
+
+# Optional: Ignore uploads folder (if storing images/files locally)
+uploads/

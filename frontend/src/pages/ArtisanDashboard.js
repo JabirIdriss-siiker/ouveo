@@ -5,6 +5,7 @@ import { FaUsers, FaTools, FaCalendarCheck, FaEuroSign } from "react-icons/fa";
 import { motion } from "framer-motion";
 import Sidebar from "../components/SideBar";
 import { jwtDecode } from "jwt-decode";
+import apiClient from "../api/apiClient"
 
 const ArtisanDashboard = () => {
   const [bookings, setBookings] = useState([]);

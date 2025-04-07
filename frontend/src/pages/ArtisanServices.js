@@ -5,6 +5,7 @@ import ServiceCard from "../components/ServiceCard";
 import { ClipLoader } from "react-spinners";
 import { FaStar, FaTools, FaMapMarkerAlt } from "react-icons/fa";
 import { motion } from "framer-motion";
+import apiClient from "../api/apiClient"
 
 const ArtisanServices = () => {
   const { id } = useParams();

@@ -1,7 +1,8 @@
+// src/pages/Login.js
 import React, { useState } from "react";
-import axios from "axios";
 import { toast } from "react-toastify";
 import { ClipLoader } from "react-spinners";
+import apiClient from "../api/apiClient"; // Adjust path based on your structure
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -16,7 +17,7 @@ const Login = () => {
     }
     setLoading(true);
     try {
-      const response = await axios.post("http://localhost:5000/api/auth/login", {
+      const response = await apiClient.post("/api/auth/login", {
         email,
         password,
       });
@@ -24,7 +25,7 @@ const Login = () => {
       toast.success("Connexion réussie!");
       window.location.href = "/";
     } catch (error) {
-      toast.error("Erreur de connexion");
+      toast.error(error.response?.data?.message || "Erreur de connexion");
     } finally {
       setLoading(false);
     }
@@ -33,7 +34,7 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-light flex items-center justify-center py-8 px-4 sm:px-6">
       <form onSubmit={handleLogin} className="card-modern p-6 sm:p-8 w-full max-w-sm sm:max-w-md">
-        <h2 className="text-xl sm:text-2xl font-bold text-dark mb-4 sm:mb-6 text-center gradient-text">
+        <h2 className="text-xl sm:text-2xl font-bold text-dark mb-4 sm:mb-6 text-center gradient-text font-anton">
           Connexion
         </h2>
         <div className="form-group">
