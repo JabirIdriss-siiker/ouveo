@@ -1,10 +1,11 @@
+// src/pages/Dashboardbookings.js
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { toast } from "react-toastify";
 import { ClipLoader } from "react-spinners";
 import { motion } from "framer-motion";
-import Sidebar from "./SideBar";
+import Sidebar from "../components/SideBar"; // Fixed typo and assumed path
 import { jwtDecode } from "jwt-decode";
+import apiClient from "../api/apiClient"; // Adjust path based on your structure
 
 const Dashboardbookings = () => {
   const [bookings, setBookings] = useState([]);
@@ -19,17 +20,14 @@ const Dashboardbookings = () => {
   const fetchBookings = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("http://localhost:5000/api/bookings/artisan", {
-        headers: { "x-auth-token": token },
-      });
-      // Sort by date and time (newest first)
+      const response = await apiClient.get("/api/bookings/artisan");
       const sortedBookings = response.data.sort((a, b) =>
         new Date(b.bookingDate + " " + b.startTime) - new Date(a.bookingDate + " " + a.startTime)
       );
       setBookings(sortedBookings);
       applyFilters(sortedBookings, statusFilter, dateFilter);
     } catch (error) {
-      console.error("Error fetching bookings:", error);
+      console.error("Erreur lors du chargement des réservations:", error);
       toast.error("Erreur lors du chargement des réservations");
     } finally {
       setLoading(false);
@@ -68,11 +66,7 @@ const Dashboardbookings = () => {
   const handleUpdateStatus = async (bookingId, newStatus) => {
     setLoading(true);
     try {
-      const response = await axios.put(
-        "http://localhost:5000/api/bookings/status",
-        { bookingId, status: newStatus },
-        { headers: { "x-auth-token": token } }
-      );
+      const response = await apiClient.put("/api/bookings/status", { bookingId, status: newStatus });
       const updatedBooking = response.data.booking;
       setBookings((prev) =>
         prev
@@ -81,7 +75,7 @@ const Dashboardbookings = () => {
       );
       toast.success(`Réservation ${newStatus === "accepté" ? "acceptée" : "terminée"} avec succès !`);
     } catch (error) {
-      console.error("Error updating booking:", error);
+      console.error("Erreur lors de la mise à jour:", error);
       toast.error(error.response?.data?.message || "Erreur lors de la mise à jour");
     } finally {
       setLoading(false);
@@ -99,21 +93,21 @@ const Dashboardbookings = () => {
   const historyBookings = filteredBookings.filter((b) => b.status !== "en attente");
 
   return (
-    <div className="flex min-h-screen bg-light">
+    <div className="flex min-h-screen bg-light font-anton text-dark">
       <Sidebar userInfo={userInfo} />
-      <div className="flex-1 ml-64 p-8">
+      <div className="flex-1 md:ml-64 p-4 md:p-8">
         <div className="container mx-auto">
           {/* Header */}
           <motion.header
             initial="hidden"
             animate="visible"
             variants={fadeInUp}
-            className="mb-12 flex justify-between items-center"
+            className="mb-8 md:mb-12 flex flex-col sm:flex-row justify-between items-center gap-4"
           >
-            <h2 className="section-title">Gestion des Réservations</h2>
+            <h2 className="section-title text-center sm:text-left">Gestion des Réservations</h2>
             <button
               onClick={fetchBookings}
-              className="btn-primary px-6 py-3"
+              className="btn-primary px-4 py-2 md:px-6 md:py-3"
               disabled={loading}
             >
               {loading ? <ClipLoader size={20} color="var(--light)" /> : "Rafraîchir"}
@@ -125,14 +119,14 @@ const Dashboardbookings = () => {
             initial="hidden"
             animate="visible"
             variants={fadeInUp}
-            className="mb-8 glass-card p-6 flex flex-col sm:flex-row gap-6"
+            className="mb-6 md:mb-8 glass-card p-4 sm:p-6 flex flex-col sm:flex-row gap-4 md:gap-6"
           >
             <div className="form-group flex-1">
-              <label className="form-label">Filtrer par statut</label>
+              <label className="form-label text-sm md:text-base">Filtrer par statut</label>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="input-modern"
+                className="input-modern w-full"
               >
                 <option value="all">Tous</option>
                 <option value="en attente">En attente</option>
@@ -141,12 +135,12 @@ const Dashboardbookings = () => {
               </select>
             </div>
             <div className="form-group flex-1">
-              <label className="form-label">Filtrer par date</label>
+              <label className="form-label text-sm md:text-base">Filtrer par date</label>
               <input
                 type="date"
                 value={dateFilter}
                 onChange={(e) => setDateFilter(e.target.value)}
-                className="input-modern"
+                className="input-modern w-full"
               />
             </div>
           </motion.div>
@@ -154,22 +148,26 @@ const Dashboardbookings = () => {
           {/* Bookings List */}
           <motion.div initial="hidden" animate="visible" variants={fadeInUp}>
             {loading && !bookings.length ? (
-              <div className="flex justify-center py-10">
+              <div className="flex justify-center py-8 md:py-10">
                 <ClipLoader size={40} color="var(--dark)" />
               </div>
             ) : filteredBookings.length === 0 ? (
-              <p className="text-center text-dark/70 py-10">
+              <p className="text-center text-dark/70 py-8 md:py-10 text-sm md:text-base font-poppins">
                 Aucune réservation trouvée pour ces critères
               </p>
             ) : (
-              <div className="space-y-12">
+              <div className="space-y-8 md:space-y-12">
                 {/* New Reservations Section */}
                 <div>
-                  <h3 className="text-2xl font-semibold text-dark mb-6">Nouvelles Réservations</h3>
+                  <h3 className="text-lg md:text-2xl font-semibold text-dark mb-4 md:mb-6">
+                    Nouvelles Réservations
+                  </h3>
                   {newBookings.length === 0 ? (
-                    <p className="text-dark/70">Aucune nouvelle réservation</p>
+                    <p className="text-dark/70 text-sm md:text-base font-poppins">
+                      Aucune nouvelle réservation
+                    </p>
                   ) : (
-                    <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                    <div className="grid gap-4 sm:gap-6 md:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                       {newBookings.map((booking, index) => (
                         <motion.div
                           key={booking._id}
@@ -178,32 +176,32 @@ const Dashboardbookings = () => {
                           viewport={{ once: true }}
                           variants={fadeInUp}
                           transition={{ delay: index * 0.1 }}
-                          className="card-modern hover-card p-6"
+                          className="card-modern hover-card p-4 sm:p-6"
                         >
-                          <div className="flex justify-between items-start mb-4">
+                          <div className="flex justify-between items-start mb-3 md:mb-4">
                             <div>
-                              <h4 className="text-xl font-semibold text-dark">
+                              <h4 className="text-base sm:text-xl font-semibold text-dark">
                                 {booking.serviceId?.title || "Service non trouvé"}
                               </h4>
-                              <div className="text-dark/70 text-sm space-y-2">
+                              <div className="text-dark/70 text-xs sm:text-sm space-y-1 md:space-y-2 font-poppins">
                                 <p>Client: {booking.clientId?.name || "Inconnu"}</p>
                                 <p>Date: {new Date(booking.bookingDate).toLocaleDateString("fr-FR")}</p>
                                 <p>Horaire: {booking.startTime} - {booking.endTime}</p>
                               </div>
                             </div>
-                            <span className="badge bg-primary/10 text-primary">
+                            <span className="badge bg-primary/10 text-primary text-xs md:text-sm">
                               {booking.status}
                             </span>
                           </div>
                           {booking.notes && (
-                            <p className="text-dark/70 text-sm mb-4 italic">
+                            <p className="text-dark/70 text-xs sm:text-sm mb-3 md:mb-4 italic font-poppins">
                               Notes: {booking.notes}
                             </p>
                           )}
-                          <div className="flex gap-4">
+                          <div className="flex gap-2 md:gap-4">
                             <button
                               onClick={() => handleUpdateStatus(booking._id, "accepté")}
-                              className="btn-primary flex-1"
+                              className="btn-primary flex-1 text-sm md:text-base"
                               disabled={loading}
                             >
                               {loading ? <ClipLoader size={20} color="var(--light)" /> : "Accepter"}
@@ -217,11 +215,13 @@ const Dashboardbookings = () => {
 
                 {/* History Section */}
                 <div>
-                  <h3 className="text-2xl font-semibold text-dark mb-6">Historique</h3>
+                  <h3 className="text-lg md:text-2xl font-semibold text-dark mb-4 md:mb-6">Historique</h3>
                   {historyBookings.length === 0 ? (
-                    <p className="text-dark/70">Aucun historique disponible</p>
+                    <p className="text-dark/70 text-sm md:text-base font-poppins">
+                      Aucun historique disponible
+                    </p>
                   ) : (
-                    <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                    <div className="grid gap-4 sm:gap-6 md:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                       {historyBookings.map((booking, index) => (
                         <motion.div
                           key={booking._id}
@@ -230,21 +230,21 @@ const Dashboardbookings = () => {
                           viewport={{ once: true }}
                           variants={fadeInUp}
                           transition={{ delay: index * 0.1 }}
-                          className="card-modern hover-card p-6"
+                          className="card-modern hover-card p-4 sm:p-6"
                         >
-                          <div className="flex justify-between items-start mb-4">
+                          <div className="flex justify-between items-start mb-3 md:mb-4">
                             <div>
-                              <h4 className="text-xl font-semibold text-dark">
+                              <h4 className="text-base sm:text-xl font-semibold text-dark">
                                 {booking.serviceId?.title || "Service non trouvé"}
                               </h4>
-                              <div className="text-dark/70 text-sm space-y-2">
+                              <div className="text-dark/70 text-xs sm:text-sm space-y-1 md:space-y-2 font-poppins">
                                 <p>Client: {booking.clientId?.name || "Inconnu"}</p>
                                 <p>Date: {new Date(booking.bookingDate).toLocaleDateString("fr-FR")}</p>
                                 <p>Horaire: {booking.startTime} - {booking.endTime}</p>
                               </div>
                             </div>
                             <span
-                              className={`badge ${
+                              className={`badge text-xs md:text-sm ${
                                 booking.status === "accepté"
                                   ? "bg-primary-light text-dark"
                                   : "bg-dark-soft text-light"
@@ -254,15 +254,15 @@ const Dashboardbookings = () => {
                             </span>
                           </div>
                           {booking.notes && (
-                            <p className="text-dark/70 text-sm mb-4 italic">
+                            <p className="text-dark/70 text-xs sm:text-sm mb-3 md:mb-4 italic font-poppins">
                               Notes: {booking.notes}
                             </p>
                           )}
                           {booking.status === "accepté" && (
-                            <div className="flex gap-4">
+                            <div className="flex gap-2 md:gap-4">
                               <button
                                 onClick={() => handleUpdateStatus(booking._id, "terminé")}
-                                className="btn-primary flex-1"
+                                className="btn-primary flex-1 text-sm md:text-base"
                                 disabled={loading}
                               >
                                 {loading ? <ClipLoader size={20} color="var(--light)" /> : "Terminer"}

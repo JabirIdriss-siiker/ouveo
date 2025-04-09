@@ -70,63 +70,76 @@ const RevenueTracking = () => {
   return (
     <div className="flex min-h-screen bg-light font-anton text-dark">
       <AdminSidebar userInfo={userInfo} />
-      <div className="flex-1 ml-64 p-8">
+      <div className="flex-1 md:ml-64 p-4 md:p-8">
         <motion.div initial="hidden" animate="visible" variants={fadeIn} className="container mx-auto">
-          <div className="flex justify-between items-center mb-12">
-            <h1 className="section-title mb-0">Suivi des Revenus</h1>
-            <div className="flex gap-4">
-              <div className="flex gap-4 items-center">
+          <div className="flex flex-col sm:flex-row justify-between items-center mb-6 md:mb-12 gap-4">
+            <h1 className="section-title mb-0 text-center sm:text-left">Suivi des Revenus</h1>
+            <div className="flex flex-col sm:flex-row gap-3 md:gap-4 w-full sm:w-auto">
+              <div className="flex flex-col sm:flex-row gap-2 md:gap-4 items-center">
                 <input
                   type="date"
                   value={dateRange.startDate}
                   onChange={(e) => setDateRange({ ...dateRange, startDate: e.target.value })}
-                  className="input-modern"
+                  className="input-modern w-full sm:w-auto text-sm md:text-base"
                 />
-                <span>à</span>
+                <span className="text-dark/70 text-sm md:text-base">à</span>
                 <input
                   type="date"
                   value={dateRange.endDate}
                   onChange={(e) => setDateRange({ ...dateRange, endDate: e.target.value })}
-                  className="input-modern"
+                  className="input-modern w-full sm:w-auto text-sm md:text-base"
                 />
               </div>
-              <button onClick={fetchRevenueData} className="btn-primary px-6">
+              <button
+                onClick={fetchRevenueData}
+                className="btn-primary px-4 py-2 sm:px-6 sm:py-3 text-sm md:text-base"
+              >
                 Rafraîchir
               </button>
             </div>
           </div>
 
           {loading ? (
-            <div className="flex justify-center py-10">
+            <div className="flex justify-center py-8 md:py-10">
               <ClipLoader size={40} color="var(--primary)" />
             </div>
+          ) : revenueData.length === 0 ? (
+            <p className="text-center text-dark/70 font-poppins text-base md:text-lg">
+              Aucune donnée de revenus pour cette période
+            </p>
           ) : (
             <>
               {/* Summary Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div className="glass-card p-6">
-                  <h3 className="text-xl font-semibold mb-2">Revenu Total</h3>
-                  <p className="text-3xl text-primary">{calculateTotalRevenue().toFixed(2)}€</p>
-                  <p className="text-dark/70 text-sm mt-2 font-poppins">Pour la période sélectionnée</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8 mb-6 md:mb-8">
+                <div className="glass-card p-4 sm:p-6">
+                  <h3 className="text-lg sm:text-xl font-semibold mb-2">Revenu Total</h3>
+                  <p className="text-2xl sm:text-3xl text-primary">{calculateTotalRevenue().toFixed(2)}€</p>
+                  <p className="text-dark/70 text-xs sm:text-sm mt-2 font-poppins">
+                    Pour la période sélectionnée
+                  </p>
                 </div>
-                <div className="glass-card p-6">
-                  <h3 className="text-xl font-semibold mb-2">Revenu Moyen / Jour</h3>
-                  <p className="text-3xl text-primary">{calculateAverageRevenue().toFixed(2)}€</p>
-                  <p className="text-dark/70 text-sm mt-2 font-poppins">Pour la période sélectionnée</p>
+                <div className="glass-card p-4 sm:p-6">
+                  <h3 className="text-lg sm:text-xl font-semibold mb-2">Revenu Moyen / Jour</h3>
+                  <p className="text-2xl sm:text-3xl text-primary">{calculateAverageRevenue().toFixed(2)}€</p>
+                  <p className="text-dark/70 text-xs sm:text-sm mt-2 font-poppins">
+                    Pour la période sélectionnée
+                  </p>
                 </div>
-                <div className="glass-card p-6">
-                  <h3 className="text-xl font-semibold mb-2">Total Réservations</h3>
-                  <p className="text-3xl text-primary">{calculateTotalBookings()}</p>
-                  <p className="text-dark/70 text-sm mt-2 font-poppins">Pour la période sélectionnée</p>
+                <div className="glass-card p-4 sm:p-6">
+                  <h3 className="text-lg sm:text-xl font-semibold mb-2">Total Réservations</h3>
+                  <p className="text-2xl sm:text-3xl text-primary">{calculateTotalBookings()}</p>
+                  <p className="text-dark/70 text-xs sm:text-sm mt-2 font-poppins">
+                    Pour la période sélectionnée
+                  </p>
                 </div>
               </div>
 
               {/* Revenue Chart */}
-              <div className="glass-card p-6">
-                <h3 className="text-xl font-semibold mb-6">Évolution des Revenus</h3>
-                <div className="h-96">
+              <div className="glass-card p-4 sm:p-6">
+                <h3 className="text-lg sm:text-xl font-semibold mb-4 md:mb-6">Évolution des Revenus</h3>
+                <div className="h-64 sm:h-80 md:h-96">
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={revenueData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                    <LineChart data={revenueData} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis
                         dataKey="_id"
@@ -134,16 +147,17 @@ const RevenueTracking = () => {
                           const d = new Date(date.year, date.month - 1, date.day);
                           return d.toLocaleDateString();
                         }}
+                        fontSize={12}
                       />
-                      <YAxis yAxisId="left" />
-                      <YAxis yAxisId="right" orientation="right" />
+                      <YAxis yAxisId="left" fontSize={12} />
+                      <YAxis yAxisId="right" orientation="right" fontSize={12} />
                       <Tooltip
                         labelFormatter={(value) => {
                           const d = new Date(value.year, value.month - 1, value.day);
                           return d.toLocaleDateString();
                         }}
                       />
-                      <Legend />
+                      <Legend wrapperStyle={{ fontSize: "12px" }} />
                       <Line
                         yAxisId="left"
                         type="monotone"
@@ -164,27 +178,31 @@ const RevenueTracking = () => {
               </div>
 
               {/* Detailed Table */}
-              <div className="glass-card p-6 mt-8">
-                <h3 className="text-xl font-semibold mb-6">Détails des Revenus</h3>
+              <div className="glass-card p-4 sm:p-6 mt-6 md:mt-8">
+                <h3 className="text-lg sm:text-xl font-semibold mb-4 md:mb-6">Détails des Revenus</h3>
                 <div className="overflow-x-auto">
-                  <table className="table-modern w-full">
+                  <table className="table-modern w-full text-sm md:text-base">
                     <thead>
                       <tr className="table-header">
-                        <th className="px-6 py-3">Date</th>
-                        <th className="px-6 py-3">Réservations</th>
-                        <th className="px-6 py-3">Revenus</th>
-                        <th className="px-6 py-3">Moyenne/Réservation</th>
+                        <th className="px-3 sm:px-4 md:px-6 py-2 md:py-3">Date</th>
+                        <th className="px-3 sm:px-4 md:px-6 py-2 md:py-3">Réservations</th>
+                        <th className="px-3 sm:px-4 md:px-6 py-2 md:py-3">Revenus</th>
+                        <th className="px-3 sm:px-4 md:px-6 py-2 md:py-3">Moyenne/Réservation</th>
                       </tr>
                     </thead>
                     <tbody>
                       {revenueData.map((day, index) => (
                         <tr key={index} className="table-cell hover:bg-light-soft">
-                          <td className="px-6 py-4 font-poppins">
+                          <td className="px-3 sm:px-4 md:px-6 py-3 md:py-4 font-poppins">
                             {new Date(day._id.year, day._id.month - 1, day._id.day).toLocaleDateString()}
                           </td>
-                          <td className="px-6 py-4 font-poppins">{day.bookingsCount}</td>
-                          <td className="px-6 py-4 font-poppins">{day.totalRevenue.toFixed(2)}€</td>
-                          <td className="px-6 py-4 font-poppins">
+                          <td className="px-3 sm:px-4 md:px-6 py-3 md:py-4 font-poppins">
+                            {day.bookingsCount}
+                          </td>
+                          <td className="px-3 sm:px-4 md:px-6 py-3 md:py-4 font-poppins">
+                            {day.totalRevenue.toFixed(2)}€
+                          </td>
+                          <td className="px-3 sm:px-4 md:px-6 py-3 md:py-4 font-poppins">
                             {day.bookingsCount > 0
                               ? (day.totalRevenue / day.bookingsCount).toFixed(2)
                               : "0.00"}

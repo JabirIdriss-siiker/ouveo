@@ -59,52 +59,55 @@ const ContentModeration = () => {
   return (
     <div className="flex min-h-screen bg-light font-anton text-dark">
       <AdminSidebar userInfo={userInfo} />
-      <div className="flex-1 ml-64 p-8">
+      <div className="flex-1 md:ml-64 p-4 md:p-8">
         <motion.div initial="hidden" animate="visible" variants={fadeIn} className="container mx-auto">
-          <div className="flex justify-between items-center mb-12">
-            <h1 className="section-title mb-0">Modération de Contenu</h1>
-            <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row justify-between items-center mb-6 md:mb-12 gap-4">
+            <h1 className="section-title mb-0 text-center sm:text-left">Modération de Contenu</h1>
+            <div className="flex flex-col sm:flex-row gap-3 md:gap-4 w-full sm:w-auto">
               <select
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
-                className="input-modern w-48"
+                className="input-modern w-full sm:w-48 md:w-64 text-sm md:text-base"
               >
                 <option value="all">Tous</option>
                 <option value="pending">En attente</option>
                 <option value="resolved">Résolus</option>
                 <option value="dismissed">Rejetés</option>
               </select>
-              <button onClick={fetchReports} className="btn-primary px-6">
+              <button
+                onClick={fetchReports}
+                className="btn-primary px-4 py-2 sm:px-6 sm:py-3 text-sm md:text-base"
+              >
                 Rafraîchir
               </button>
             </div>
           </div>
 
           {loading ? (
-            <div className="flex justify-center py-10">
+            <div className="flex justify-center py-8 md:py-10">
               <ClipLoader size={40} color="var(--primary)" />
             </div>
           ) : filteredReports.length === 0 ? (
-            <p className="text-center text-dark/70 font-poppins text-lg">
+            <p className="text-center text-dark/70 font-poppins text-base md:text-lg">
               Aucun signalement {filter !== "all" ? filter : ""}
             </p>
           ) : (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 sm:gap-6 md:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
               {filteredReports.map((report) => (
                 <motion.div
                   key={report._id}
                   initial="hidden"
                   animate="visible"
                   variants={fadeIn}
-                  className="glass-card p-6"
+                  className="glass-card p-4 sm:p-6"
                 >
-                  <div className="mb-4">
-                    <div className="flex justify-between items-start">
-                      <h3 className="text-xl font-semibold">
+                  <div className="mb-3 md:mb-4">
+                    <div className="flex flex-col sm:flex-row justify-between items-start gap-2">
+                      <h3 className="text-lg sm:text-xl font-semibold">
                         Signalement #{report._id.slice(-6)}
                       </h3>
                       <span
-                        className={`badge font-poppins ${
+                        className={`badge font-poppins text-xs md:text-sm ${
                           report.status === "pending"
                             ? "bg-yellow-100 text-yellow-800"
                             : report.status === "resolved"
@@ -115,12 +118,12 @@ const ContentModeration = () => {
                         {report.status}
                       </span>
                     </div>
-                    <p className="text-dark/70 text-sm font-poppins">
+                    <p className="text-dark/70 text-xs md:text-sm font-poppins">
                       {new Date(report.createdAt).toLocaleString()}
                     </p>
                   </div>
 
-                  <div className="space-y-2 mb-6 font-poppins">
+                  <div className="space-y-2 mb-4 md:mb-6 font-poppins text-sm md:text-base">
                     <p>
                       <strong>Type:</strong> {report.reportedItem?.type || "Non spécifié"}
                     </p>
@@ -136,14 +139,14 @@ const ContentModeration = () => {
                   </div>
 
                   {report.status === "pending" && (
-                    <div className="space-y-4">
+                    <div className="space-y-3 md:space-y-4">
                       <textarea
                         placeholder="Notes du modérateur..."
-                        className="input-modern w-full"
-                        rows="3"
+                        className="input-modern w-full text-sm md:text-base"
+                        rows="2 sm:rows-3"
                         id={`notes-${report._id}`}
                       />
-                      <div className="flex gap-4">
+                      <div className="flex flex-col sm:flex-row gap-2 md:gap-4">
                         <button
                           onClick={() =>
                             handleReport(
@@ -152,7 +155,7 @@ const ContentModeration = () => {
                               document.getElementById(`notes-${report._id}`).value
                             )
                           }
-                          className="btn-primary flex-1 bg-green-500 hover:bg-green-600"
+                          className="btn-primary flex-1 bg-green-500 hover:bg-green-600 text-sm md:text-base"
                         >
                           Résoudre
                         </button>
@@ -164,7 +167,7 @@ const ContentModeration = () => {
                               document.getElementById(`notes-${report._id}`).value
                             )
                           }
-                          className="btn-primary flex-1 bg-red-500 hover:bg-red-600"
+                          className="btn-primary flex-1 bg-red-500 hover:bg-red-600 text-sm md:text-base"
                         >
                           Rejeter
                         </button>
@@ -173,9 +176,13 @@ const ContentModeration = () => {
                   )}
 
                   {report.status !== "pending" && report.moderatorNotes && (
-                    <div className="mt-4 p-3 bg-light-soft rounded-xl">
-                      <p className="font-semibold font-poppins">Notes du modérateur:</p>
-                      <p className="text-dark/70 font-poppins">{report.moderatorNotes}</p>
+                    <div className="mt-3 md:mt-4 p-2 md:p-3 bg-light-soft rounded-xl">
+                      <p className="font-semibold font-poppins text-sm md:text-base">
+                        Notes du modérateur:
+                      </p>
+                      <p className="text-dark/70 font-poppins text-xs md:text-sm">
+                        {report.moderatorNotes}
+                      </p>
                     </div>
                   )}
                 </motion.div>

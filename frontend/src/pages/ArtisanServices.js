@@ -44,55 +44,55 @@ const ArtisanServices = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex justify-center items-center bg-light">
-        <ClipLoader size={50} color="var(--primary)" />
+        <ClipLoader size={40} color="var(--primary)" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-light py-16 px-4 sm:px-8 font-anton text-dark overflow-x-hidden">
-      <div className="container mx-auto px-4 sm:px-8">
+    <div className="min-h-screen bg-light py-8 md:py-16 px-2 sm:px-4 md:px-8 font-anton text-dark overflow-x-hidden">
+      <div className="container mx-auto px-2 sm:px-4 md:px-0">
         {/* Artisan Profile */}
         {artisan ? (
           <motion.div
             initial="hidden"
             animate="visible"
             variants={fadeInUp}
-            className="glass-card p-6 sm:p-8 mb-12 relative overflow-hidden"
+            className="glass-card p-4 sm:p-6 md:p-8 mb-8 md:mb-12 relative overflow-hidden"
           >
             {/* Shimmer Overlay */}
             <div className="shimmer absolute inset-0 opacity-0 hover:opacity-20 transition-opacity duration-300"></div>
 
             {/* Profile Content */}
-            <div className="relative z-10 flex flex-col sm:flex-row items-center sm:items-start gap-6">
+            <div className="relative z-10 flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
               <img
                 src={
                   artisan.profilePicture
                     ? `${process.env.REACT_APP_API_URL}/${artisan.profilePicture}`
-                    : `https://ui-avatars.com/api/?name=${artisan.name}&background=random`
+                    : `https://ui-avatars.com/api/?name=${encodeURIComponent(artisan.name)}&background=random`
                 }
                 alt={artisan.name}
-                className="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-light shadow-md animate-float"
+                className="w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 rounded-full object-cover border-4 border-light shadow-md animate-float"
               />
-              <div className="text-center sm:text-left space-y-3">
-                <h2 className="text-3xl sm:text-4xl font-extrabold text-dark">{artisan.name}</h2>
-                <p className="text-dark/70 text-base sm:text-lg flex items-center justify-center sm:justify-start font-poppins">
+              <div className="text-center sm:text-left space-y-2 sm:space-y-3">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-dark">{artisan.name}</h2>
+                <p className="text-dark/70 text-sm sm:text-base md:text-lg flex items-center justify-center sm:justify-start font-poppins">
                   <FaTools className="mr-2 text-primary" />
                   {artisan.specialty || "Artisan polyvalent"}
                 </p>
-                <p className="text-dark/70 text-base sm:text-lg flex items-center justify-center sm:justify-start font-poppins">
+                <p className="text-dark/70 text-sm sm:text-base md:text-lg flex items-center justify-center sm:justify-start font-poppins">
                   <FaMapMarkerAlt className="mr-2 text-dark" />
                   {artisan.location || "Localisation non spécifiée"}
                 </p>
-                <p className="text-dark/70 text-base sm:text-lg max-w-2xl font-poppins">
+                <p className="text-dark/70 text-sm sm:text-base md:text-lg max-w-2xl font-poppins">
                   {artisan.bio || "Un artisan passionné prêt à vous aider."}
                 </p>
-                <p className="text-primary text-base sm:text-lg flex items-center justify-center sm:justify-start font-poppins">
+                <p className="text-primary text-sm sm:text-base md:text-lg flex items-center justify-center sm:justify-start font-poppins">
                   <FaStar className="mr-2" />
                   {artisan.rating ? `${artisan.rating}/5` : "Non évalué"}
                   {artisan.ratingCount && ` (${artisan.ratingCount} avis)`}
                 </p>
-                <p className="text-dark/70 text-base sm:text-lg font-poppins">
+                <p className="text-dark/70 text-sm sm:text-base md:text-lg font-poppins">
                   <strong className="text-dark">Services:</strong> {services.length}
                 </p>
               </div>
@@ -103,7 +103,7 @@ const ArtisanServices = () => {
             initial="hidden"
             animate="visible"
             variants={fadeInUp}
-            className="text-center text-dark/70 text-lg sm:text-xl font-medium mb-12 font-poppins"
+            className="text-center text-dark/70 text-base sm:text-lg md:text-xl font-medium mb-8 md:mb-12 font-poppins"
           >
             Artisan non trouvé.
           </motion.p>
@@ -115,11 +115,11 @@ const ArtisanServices = () => {
           whileInView="visible"
           viewport={{ once: true }}
           variants={fadeInUp}
-          className="section-title text-center"
+          className="section-title text-center mb-6 md:mb-8"
         >
           Portfolio
         </motion.h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 mb-8 md:mb-12">
           {portfolio.length > 0 ? (
             portfolio.map((item, index) => (
               <motion.div
@@ -136,16 +136,16 @@ const ArtisanServices = () => {
                     <img
                       src={`${process.env.REACT_APP_API_URL}/${item.image}`}
                       alt={item.title}
-                      className="w-full h-48 sm:h-56 object-cover transition-transform duration-300 group-hover:scale-105"
+                      className="w-full h-36 sm:h-48 md:h-56 object-cover transition-transform duration-300 group-hover:scale-105"
                     />
                     <div className="shimmer absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
                   </div>
                 )}
-                <div className="p-6">
-                  <h4 className="text-lg sm:text-xl font-semibold text-dark group-hover:text-primary transition-all duration-300">
+                <div className="p-4 sm:p-5 md:p-6">
+                  <h4 className="text-base sm:text-lg md:text-xl font-semibold text-dark group-hover:text-primary transition-all duration-300">
                     {item.title}
                   </h4>
-                  <p className="text-dark/70 text-sm sm:text-base line-clamp-3 mt-2 font-poppins">
+                  <p className="text-dark/70 text-xs sm:text-sm md:text-base line-clamp-3 mt-2 font-poppins">
                     {item.description}
                   </p>
                 </div>
@@ -156,7 +156,7 @@ const ArtisanServices = () => {
               initial="hidden"
               whileInView="visible"
               variants={fadeInUp}
-              className="text-center text-dark/70 col-span-full text-base sm:text-lg font-medium font-poppins"
+              className="text-center text-dark/70 col-span-full text-sm sm:text-base md:text-lg font-medium font-poppins"
             >
               Cet artisan n'a pas encore ajouté de projets à son portfolio.
             </motion.p>
@@ -169,11 +169,11 @@ const ArtisanServices = () => {
           whileInView="visible"
           viewport={{ once: true }}
           variants={fadeInUp}
-          className="section-title text-center"
+          className="section-title text-center mb-6 md:mb-8"
         >
           Services proposés
         </motion.h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 mb-8 md:mb-12">
           {services.length > 0 ? (
             services.map((service, index) => (
               <motion.div
@@ -192,7 +192,7 @@ const ArtisanServices = () => {
               initial="hidden"
               whileInView="visible"
               variants={fadeInUp}
-              className="text-center text-dark/70 col-span-full text-base sm:text-lg font-medium font-poppins"
+              className="text-center text-dark/70 col-span-full text-sm sm:text-base md:text-lg font-medium font-poppins"
             >
               Cet artisan n'a pas encore ajouté de services.
             </motion.p>
