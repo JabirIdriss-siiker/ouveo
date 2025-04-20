@@ -2,7 +2,7 @@ const express = require("express");
 const {
   createBooking,
   getArtisanBookings,
-  getClientBookings,
+  getAllBookings,
   updateBookingStatus,
   deleteBooking,
   getAvailableTimeSlots
@@ -13,7 +13,7 @@ const router = express.Router();
 router.post("/", auth, createBooking);
 router.get("/available-slots", auth, getAvailableTimeSlots);
 router.get("/artisan", auth, getArtisanBookings);
-router.get("/client", auth, getClientBookings);
+router.get("/all", auth, getAllBookings);
 router.put("/status", auth, updateBookingStatus);
 router.delete("/:id", auth, deleteBooking);
 

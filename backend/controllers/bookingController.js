@@ -1,7 +1,7 @@
 const Booking = require("../models/Booking");
 const Service = require("../models/Service");
 const moment = require("moment");
-require("moment/locale/fr"); // Ensure French locale is loaded
+require("moment/locale/fr");
 
 moment.locale("fr");
 
@@ -41,7 +41,7 @@ const isTimeSlotAvailable = async (serviceId, bookingDate, startTime, endTime) =
 
 // Helper: Check if startTime is within service hours
 const isWithinServiceHours = (service, bookingDate, startTime) => {
-  const dayOfWeek = moment(bookingDate).format("dddd"); // e.g., "Lundi"
+  const dayOfWeek = moment(bookingDate).format("dddd");
   const timeSlot = service.timeSlots.find(
     (slot) => slot.day.toLowerCase() === dayOfWeek.toLowerCase()
   );
@@ -52,22 +52,21 @@ const isWithinServiceHours = (service, bookingDate, startTime) => {
   const end = moment(timeSlot.endTime, "HH:mm");
   const requested = moment(startTime, "HH:mm");
 
-  return requested.isBetween(start, end, null, "[]"); // Inclusive range
+  return requested.isBetween(start, end, null, "[]");
 };
 
 // Create a new booking
 exports.createBooking = async (req, res) => {
-  const { serviceId, artisanId, bookingDate, startTime, notes } = req.body;
-  const clientId = req.user.id;
+  const { serviceId, artisanId, bookingDate, startTime, notes, customerName, customerPhone, customerEmail } = req.body;
 
   try {
     // Role check
-    if (req.user.role !== "client") {
-      return res.status(403).json({ message: "Accès réservé aux clients" });
+    if (!["secretary", "artisan"].includes(req.user.role)) {
+      return res.status(403).json({ message: "Accès non autorisé" });
     }
 
     // Validate required fields
-    if (!serviceId || !artisanId || !bookingDate || !startTime) {
+    if (!serviceId || !artisanId || !bookingDate || !startTime || !customerName || !customerPhone || !customerEmail) {
       return res.status(400).json({ message: "Tous les champs obligatoires doivent être fournis" });
     }
 
@@ -101,14 +100,17 @@ exports.createBooking = async (req, res) => {
 
     // Create booking
     const booking = new Booking({
-      clientId,
+      customerName,
+      customerPhone,
+      customerEmail,
       artisanId,
       serviceId,
       bookingDate,
       startTime,
       endTime,
       notes: notes || "",
-      status: "en attente", // Consistent with your existing logic
+      status: "en attente",
+      createdBy: req.user.id
     });
 
     await booking.save();
@@ -127,18 +129,15 @@ exports.getAvailableTimeSlots = async (req, res) => {
   const { serviceId, date } = req.query;
 
   try {
-    // Validate inputs
     if (!serviceId || !date) {
       return res.status(400).json({ message: "ServiceId et date sont requis" });
     }
 
-    // Fetch service
     const service = await Service.findById(serviceId);
     if (!service) {
       return res.status(404).json({ message: "Service non trouvé" });
     }
 
-    // Get day of week
     const dayOfWeek = moment(date, "YYYY-MM-DD").format("dddd");
     const timeSlot = service.timeSlots.find(
       (slot) => slot.day.toLowerCase() === dayOfWeek.toLowerCase()
@@ -148,20 +147,16 @@ exports.getAvailableTimeSlots = async (req, res) => {
       return res.status(200).json({ availableSlots: [] });
     }
 
-    // Generate all possible slots
     const { startTime, endTime } = timeSlot;
     const { duration, bufferTime = 0 } = service;
     const slots = [];
     let current = moment(`${date} ${startTime}`, "YYYY-MM-DD HH:mm");
     const end = moment(`${date} ${endTime}`, "YYYY-MM-DD HH:mm");
 
-    while (
-      current.clone().add(duration + bufferTime, "minutes").isSameOrBefore(end)
-    ) {
+    while (current.clone().add(duration + bufferTime, "minutes").isSameOrBefore(end)) {
       const slotStart = current.format("HH:mm");
       const slotEnd = current.clone().add(duration + bufferTime, "minutes").format("HH:mm");
 
-      // Check if this slot is available
       if (await isTimeSlotAvailable(serviceId, date, slotStart, slotEnd)) {
         slots.push(slotStart);
       }
@@ -184,8 +179,7 @@ exports.getArtisanBookings = async (req, res) => {
 
     const bookings = await Booking.find({ artisanId: req.user.id })
       .populate("serviceId", "title price")
-      .populate("clientId", "name")
-      .sort({ bookingDate: 1, startTime: 1 }); // Sort by date and time
+      .sort({ bookingDate: 1, startTime: 1 });
 
     res.status(200).json(bookings);
   } catch (error) {
@@ -194,21 +188,21 @@ exports.getArtisanBookings = async (req, res) => {
   }
 };
 
-// Get client's bookings
-exports.getClientBookings = async (req, res) => {
+// Get all bookings (for secretaries)
+exports.getAllBookings = async (req, res) => {
   try {
-    if (req.user.role !== "client") {
-      return res.status(403).json({ message: "Accès réservé aux clients" });
+    if (req.user.role !== "secretary") {
+      return res.status(403).json({ message: "Accès réservé aux secrétaires" });
     }
 
-    const bookings = await Booking.find({ clientId: req.user.id })
+    const bookings = await Booking.find()
       .populate("serviceId", "title price")
       .populate("artisanId", "name")
-      .sort({ bookingDate: 1, startTime: 1 }); // Sort by date and time
+      .sort({ bookingDate: 1, startTime: 1 });
 
     res.status(200).json(bookings);
   } catch (error) {
-    console.error("Erreur lors de la récupération des réservations client:", error);
+    console.error("Erreur lors de la récupération des réservations:", error);
     res.status(500).json({ message: "Erreur serveur" });
   }
 };
@@ -218,11 +212,10 @@ exports.updateBookingStatus = async (req, res) => {
   const { bookingId, status } = req.body;
 
   try {
-    if (req.user.role !== "artisan") {
-      return res.status(403).json({ message: "Accès réservé aux artisans" });
+    if (!["secretary", "artisan"].includes(req.user.role)) {
+      return res.status(403).json({ message: "Accès non autorisé" });
     }
 
-    // Validate input
     if (!bookingId || !status) {
       return res.status(400).json({ message: "BookingId et status sont requis" });
     }
@@ -237,12 +230,31 @@ exports.updateBookingStatus = async (req, res) => {
       return res.status(404).json({ message: "Réservation non trouvée" });
     }
 
-    if (booking.artisanId.toString() !== req.user.id) {
+    if (req.user.role === "artisan" && booking.artisanId.toString() !== req.user.id) {
       return res.status(403).json({ message: "Vous n'êtes pas autorisé à modifier cette réservation" });
     }
 
     booking.status = status;
     await booking.save();
+
+     // Auto-create mission if status is "accepté"
+     if (status === "accepté") {
+      const existingMission = await Mission.findOne({ bookingId });
+      if (!existingMission) {
+        const mission = new Mission({
+          bookingId,
+          title: booking.serviceId.title,
+          description: booking.notes || "Mission pour " + booking.serviceId.title,
+          artisanId: booking.artisanId._id,
+          clientName: booking.customerName,
+          clientAddress: booking.customerAddress || "",
+          clientPhone: booking.customerPhone,
+          startDate: booking.bookingDate,
+          workDetails: {},
+        });
+        await mission.save();
+      }
+    }
 
     res.status(200).json({
       message: "Statut de la réservation mis à jour",
@@ -257,21 +269,21 @@ exports.updateBookingStatus = async (req, res) => {
 // Delete a booking
 exports.deleteBooking = async (req, res) => {
   try {
+    if (!["secretary", "artisan"].includes(req.user.role)) {
+      return res.status(403).json({ message: "Accès non autorisé" });
+    }
+
     const booking = await Booking.findById(req.params.id);
     if (!booking) {
       return res.status(404).json({ message: "Réservation non trouvée" });
     }
 
-    // Only allow client to delete if status is "en attente"
-    if (
-      booking.clientId.toString() !== req.user.id ||
-      booking.status !== "en attente"
-    ) {
-      return res.status(403).json({ message: "Action non autorisée" });
+    if (req.user.role === "artisan" && booking.artisanId.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Vous n'êtes pas autorisé à supprimer cette réservation" });
     }
 
     await Booking.deleteOne({ _id: booking._id });
-    res.status(200).json({ message: "Réservation annulée avec succès" });
+    res.status(200).json({ message: "Réservation supprimée avec succès" });
   } catch (error) {
     console.error("Erreur lors de la suppression de la réservation:", error);
     res.status(500).json({ message: "Erreur serveur" });
