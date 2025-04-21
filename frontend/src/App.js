@@ -6,7 +6,9 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ArtisanDashboard from "./pages/ArtisanDashboard";
-import ClientBookings from "./pages/ClientBookings";
+import SecretaryDashboard from "./pages/secretary/SecretaryDashboard";
+import SecretaryBooking from "./pages/secretary/SecretaryBooking";
+import SecretaryMessages from "./pages/secretary/SecretaryMessages";
 import Services from "./pages/Services";
 import ArtisanServices from "./pages/ArtisanServices";
 import Profile from "./pages/Profile";
@@ -19,13 +21,17 @@ import UserManagement from "./pages/admin/UserManagement";
 import ArtisanVerification from "./pages/admin/ArtisanVerification";
 import ContentModeration from "./pages/admin/ContentModeration";
 import RevenueTracking from "./pages/admin/RevenueTracking";
-
+import ClientBookingForm from "./pages/ClientBookingForm";
+import ArtisanMission from "./pages/ArtisanMissions"
 const AppContent = () => {
   const location = useLocation();
-  const isDashboard = location.pathname.startsWith("/artisan/dashboard") || location.pathname.startsWith("/admin/");
+  const isDashboard = location.pathname.startsWith("/artisan/dashboard") || 
+                     location.pathname.startsWith("/admin/") ||
+                     location.pathname.startsWith("/secretary");
   const isDashboardServices = location.pathname === "/artisan/portfolio";
   const profile = location.pathname === "/profile";
-
+  const isSecretaryDashboard = location.pathname.startsWith("/secretary/dashboard");
+  
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
@@ -35,15 +41,19 @@ const AppContent = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/artisan/dashboard" element={<ArtisanDashboard />} />
+          <Route path="/secretary/dashboard" element={<SecretaryDashboard />} />
+          <Route path="/secretary/booking" element={<SecretaryBooking />} />
+          <Route path="/secretary/messages" element={<SecretaryMessages />} />
           <Route path="/artisan/dashboard/services" element={<Dashboardmesservices />} />
           <Route path="/artisan/dashboard/bookings" element={<Dashboardbookings />} />
-          <Route path="/client/bookings" element={<ClientBookings />} />
           <Route path="/services" element={<Services />} />
           <Route path="/services/artisan/:id" element={<ArtisanServices />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/about" element={<About />} />
           <Route path="/artisan/portfolio" element={<PortfolioManagement />} />
-          
+          <Route path="/booking" element={<ClientBookingForm />} />
+          <Route path="/artisan/mission" element={<ArtisanMission /> }/>
+
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/users" element={<UserManagement />} />
@@ -52,7 +62,7 @@ const AppContent = () => {
           <Route path="/admin/revenue" element={<RevenueTracking />} />
         </Routes>
       </main>
-      {!isDashboard && !isDashboardServices && !profile && <Footer />}
+      {!isDashboard && !isDashboardServices && !profile && !isSecretaryDashboard && <Footer />}
     </div>
   );
 };
