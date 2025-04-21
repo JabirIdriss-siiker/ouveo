@@ -1,5 +1,7 @@
 const Booking = require("../models/Booking");
 const Service = require("../models/Service");
+const Mission = require("../models/Mission");
+
 const moment = require("moment");
 require("moment/locale/fr");
 
@@ -57,70 +59,125 @@ const isWithinServiceHours = (service, bookingDate, startTime) => {
 
 // Create a new booking
 exports.createBooking = async (req, res) => {
-  const { serviceId, artisanId, bookingDate, startTime, notes, customerName, customerPhone, customerEmail } = req.body;
-
   try {
-    // Role check
-    if (!["secretary", "artisan"].includes(req.user.role)) {
-      return res.status(403).json({ message: "Accès non autorisé" });
-    }
+    console.log("Create booking request body:", req.body); // Log incoming data
+    const {
+      customerName,
+      customerPhone,
+      customerEmail,
+      clientAddress,
+      serviceId,
+      artisanId,
+      bookingDate,
+      startTime,
+      notes,
+    } = req.body;
 
     // Validate required fields
-    if (!serviceId || !artisanId || !bookingDate || !startTime || !customerName || !customerPhone || !customerEmail) {
-      return res.status(400).json({ message: "Tous les champs obligatoires doivent être fournis" });
+    if (!customerName || !customerPhone || !customerEmail || !clientAddress || !serviceId || !artisanId || !bookingDate || !startTime) {
+      return res.status(400).json({ message: "Tous les champs obligatoires doivent être remplis" });
     }
 
-    // Fetch service
     const service = await Service.findById(serviceId);
     if (!service) {
       return res.status(404).json({ message: "Service non trouvé" });
     }
 
-    // Validate date
-    const bookingMoment = moment(bookingDate, "YYYY-MM-DD");
-    if (bookingMoment.isBefore(moment(), "day")) {
-      return res.status(400).json({ message: "La date de réservation doit être dans le futur" });
-    }
+    // Calculate endTime based on service duration
+    const duration = service.duration || 60; // Default to 60 minutes
+    const startMoment = moment(`${bookingDate} ${startTime}`, "YYYY-MM-DD HH:mm");
+    const endMoment = startMoment.clone().add(duration, "minutes");
+    const endTime = endMoment.format("HH:mm");
 
-    // Check service hours
-    if (!isWithinServiceHours(service, bookingDate, startTime)) {
-      return res.status(400).json({ message: "L'horaire choisi est en dehors des heures de service" });
-    }
-
-    // Calculate endTime
-    const endTime = moment(startTime, "HH:mm")
-      .add(service.duration + (service.bufferTime || 0), "minutes")
-      .format("HH:mm");
-
-    // Check availability
-    const isAvailable = await isTimeSlotAvailable(serviceId, bookingDate, startTime, endTime);
-    if (!isAvailable) {
-      return res.status(400).json({ message: "Ce créneau horaire n'est pas disponible" });
-    }
-
-    // Create booking
     const booking = new Booking({
       customerName,
       customerPhone,
       customerEmail,
-      artisanId,
+      clientAddress,
       serviceId,
+      artisanId,
       bookingDate,
       startTime,
       endTime,
-      notes: notes || "",
+      notes,
+      createdBy: req.user.id,
       status: "en attente",
-      createdBy: req.user.id
     });
 
     await booking.save();
-    res.status(201).json({
-      message: "Réservation créée avec succès",
-      booking,
-    });
+    res.status(201).json({ message: "Réservation créée avec succès", booking });
   } catch (error) {
     console.error("Erreur lors de la création de la réservation:", error);
-    res.status(500).json({ message: "Erreur serveur lors de la création de la réservation" });
+    if (error.name === "ValidationError") {
+      const errors = Object.values(error.errors).map((err) => err.message);
+      return res.status(400).json({ message: "Erreur de validation", errors });
+    }
+    res.status(500).json({ message: "Erreur serveur", error: error.message });
+  }
+};
+
+// Accept booking and create mission (preserved from previous fix)
+exports.acceptBookingAndCreateMission = async (req, res) => {
+  try {
+    const { bookingId } = req.params;
+    const { title, description } = req.body;
+
+    if (req.user.role !== "artisan") {
+      return res.status(403).json({ message: "Accès réservé aux artisans" });
+    }
+
+    const booking = await Booking.findById(bookingId)
+      .populate("serviceId")
+      .populate("artisanId");
+
+    if (!booking) {
+      return res.status(404).json({ message: "Réservation non trouvée" });
+    }
+
+    if (booking.artisanId._id.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Non autorisé" });
+    }
+
+    if (booking.status !== "en attente") {
+      return res.status(400).json({ message: "La réservation doit être en attente" });
+    }
+
+    // Update booking status to accepté
+    booking.status = "accepté";
+    await booking.save();
+
+    // Create mission
+    const mission = new Mission({
+      bookingId,
+      title: title || booking.serviceId.title,
+      description: description || booking.notes || "Mission pour " + booking.serviceId.title,
+      artisanId: booking.artisanId._id,
+      clientName: booking.customerName,
+      clientAddress: booking.clientAddress,
+      clientPhone: booking.customerPhone,
+      startDate: booking.bookingDate,
+      workDetails: {
+        problemDescription: "",
+        solutionApplied: "",
+        recommendations: "",
+        timeSpent: 0,
+      },
+      materials: [],
+      photos: [],
+      comments: [],
+      status: "pending",
+      createdAt: new Date(),
+    });
+
+    await mission.save();
+
+    res.status(201).json({
+      message: "Réservation acceptée et mission créée",
+      mission,
+    });
+  } catch (error) {
+    console.error("Erreur lors de l'acceptation et création de mission:", error);
+    res.status(500).json({ message: "Erreur serveur", error: error.message });
   }
 };
 
@@ -237,25 +294,7 @@ exports.updateBookingStatus = async (req, res) => {
     booking.status = status;
     await booking.save();
 
-     // Auto-create mission if status is "accepté"
-     if (status === "accepté") {
-      const existingMission = await Mission.findOne({ bookingId });
-      if (!existingMission) {
-        const mission = new Mission({
-          bookingId,
-          title: booking.serviceId.title,
-          description: booking.notes || "Mission pour " + booking.serviceId.title,
-          artisanId: booking.artisanId._id,
-          clientName: booking.customerName,
-          clientAddress: booking.customerAddress || "",
-          clientPhone: booking.customerPhone,
-          startDate: booking.bookingDate,
-          workDetails: {},
-        });
-        await mission.save();
-      }
-    }
-
+     
     res.status(200).json({
       message: "Statut de la réservation mis à jour",
       booking,
@@ -289,3 +328,20 @@ exports.deleteBooking = async (req, res) => {
     res.status(500).json({ message: "Erreur serveur" });
   }
 };
+
+exports.rejectBooking = async (req, res) => {
+  try {
+    const booking = await Booking.findById(req.params.bookingId);
+    if (!booking) return res.status(404).json({ message: "Réservation non trouvée" });
+    if (booking.artisanId.toString() !== req.user.id)
+      return res.status(403).json({ message: "Non autorisé" });
+    if (booking.status !== "en attente")
+      return res.status(400).json({ message: "Réservation non en attente" });
+    booking.status = "refusé";
+    await booking.save();
+    res.json({ message: "Réservation refusée" });
+  } catch (error) {
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+};
+

@@ -1,3 +1,4 @@
+// frontend/src/components/BookingForm.jsx
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { ClipLoader } from "react-spinners";
@@ -12,6 +13,7 @@ const BookingForm = ({ service, onSuccess }) => {
   const [notes, setNotes] = useState("");
   const [availableSlots, setAvailableSlots] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [clientAddress, setClientAddress] = useState("");
 
   useEffect(() => {
     if (bookingDate) {
@@ -33,29 +35,37 @@ const BookingForm = ({ service, onSuccess }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!customerName || !customerPhone || !customerEmail || !bookingDate || !selectedTime) {
-      toast.error("Veuillez remplir tous les champs obligatoires");
+    if (!customerName || !customerPhone || !customerEmail || !bookingDate || !selectedTime || !clientAddress) {
+      toast.error("Veuillez remplir tous les champs obligatoires, y compris l'adresse");
       return;
     }
 
     setLoading(true);
+    const payload = {
+      customerName,
+      customerPhone,
+      customerEmail,
+      clientAddress,
+      serviceId: service._id,
+      artisanId: service.artisanId,
+      bookingDate,
+      startTime: selectedTime,
+      notes,
+    };
+    console.log("Booking payload:", payload); // Log payload for debugging
     try {
-      await apiClient.post("/api/bookings", {
-        customerName,
-        customerPhone,
-        customerEmail,
-        serviceId: service._id,
-        artisanId: service.artisanId,
-        bookingDate,
-        startTime: selectedTime,
-        notes,
-      });
-
+      await apiClient.post("/api/bookings", payload);
       toast.success("Réservation créée avec succès!");
       onSuccess?.();
       resetForm();
     } catch (error) {
-      toast.error(error.response?.data?.message || "Erreur lors de la création de la réservation");
+      console.error("Error creating booking:", error.response?.data || error.message);
+      const errorMessage = error.response?.data?.message || "Erreur lors de la création de la réservation";
+      if (errorMessage.includes("clientAddress")) {
+        toast.error("L'adresse du client est requise");
+      } else {
+        toast.error(errorMessage);
+      }
     } finally {
       setLoading(false);
     }
@@ -65,6 +75,7 @@ const BookingForm = ({ service, onSuccess }) => {
     setCustomerName("");
     setCustomerPhone("");
     setCustomerEmail("");
+    setClientAddress("");
     setBookingDate("");
     setSelectedTime("");
     setNotes("");
@@ -98,6 +109,16 @@ const BookingForm = ({ service, onSuccess }) => {
           placeholder="Email"
           value={customerEmail}
           onChange={(e) => setCustomerEmail(e.target.value)}
+          className="input-modern"
+          required
+        />
+      </div>
+      <div className="form-group">
+        <input
+          type="text"
+          placeholder="Adresse"
+          value={clientAddress}
+          onChange={(e) => setClientAddress(e.target.value)}
           className="input-modern"
           required
         />

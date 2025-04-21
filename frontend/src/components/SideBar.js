@@ -10,6 +10,7 @@ import {
   FaBars,
   FaTimes,
   FaUserPlus,
+  FaFlask,
 } from "react-icons/fa";
 import logo from "../assests/logo.png";
 
@@ -29,10 +30,11 @@ const Sidebar = ({ userInfo }) => {
   const menuItems = [
     { path: "/artisan/dashboard", icon: <FaChartBar />, label: "Tableau de bord" },
     { path: "/artisan/dashboard/services", icon: <FaTools />, label: "Services" },
-    { path: "/artisan/dashboard/bookings", icon: <FaCalendarCheck />, label: "Réservations" },
+    {path: "/artisan/mission", icon: <FaFlask/>, label:"Missions"},
     { path: "/secretary/booking", icon: <FaUserPlus />, label: "Nouvelle réservation" },
     { path: "/artisan/portfolio", icon: <FaBriefcase />, label: "Mon Portfolio" },
     { path: "/profile", icon: <FaUser />, label: "Profil" },
+    { path: "/artisan/dashboard/bookings", icon: <FaCalendarCheck />, label: "Historique" },
   ];
 
   return (

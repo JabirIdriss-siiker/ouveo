@@ -4,6 +4,7 @@ const bookingSchema = new mongoose.Schema({
   customerName: { type: String, required: true },
   customerPhone: { type: String, required: true },
   customerEmail: { type: String, required: true },
+  clientAddress: { type: String, required: true },
   artisanId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   serviceId: { type: mongoose.Schema.Types.ObjectId, ref: "Service", required: true },
   status: { type: String, enum: ["en attente", "accepté", "terminé", "annulé"], default: "en attente" },
