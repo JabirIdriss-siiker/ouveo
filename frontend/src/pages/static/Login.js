@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 import { ClipLoader } from "react-spinners";
-import apiClient from "../api/apiClient"; // Adjust path based on your structure
+import apiClient from "../../api/apiClient"; // Adjust path based on your structure
 
 const Login = () => {
   const [email, setEmail] = useState("");

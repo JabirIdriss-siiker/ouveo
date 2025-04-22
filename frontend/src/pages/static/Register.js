@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { ClipLoader } from "react-spinners";
-import apiClient from "../api/apiClient"
+import apiClient from "../../api/apiClient"
 
 const Register = () => {
   const [name, setName] = useState("");
