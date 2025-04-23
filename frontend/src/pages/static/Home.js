@@ -207,7 +207,7 @@ const Home = () => {
             variants={fadeIn}
             className="text-center mt-12"
           >
-            <Link to="/services" className="btn-primary inline-flex items-center gap-2">
+            <Link to="/categories" className="btn-primary inline-flex items-center gap-2">
               En savoir plus <FaArrowRight className="text-light" />
             </Link>
           </motion.div>
