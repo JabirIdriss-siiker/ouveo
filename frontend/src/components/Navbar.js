@@ -65,7 +65,18 @@ const Navbar = () => {
                 <Link to="/profile" className="nav-link">Profil</Link>
               </>
             )}
-
+             {token && role === "secretary" && (
+              <>
+                <Link to="/secretary/dashboard" className="nav-link">Dashboard</Link>
+                
+              </>
+            )}
+            {token && role === "admin" && (
+              <>
+                <Link to="/admin" className="nav-link">Dashboard</Link>
+                
+              </>
+            )}
             {/* Auth Buttons */}
             <div className="flex items-center space-x-4">
               {token ? (
