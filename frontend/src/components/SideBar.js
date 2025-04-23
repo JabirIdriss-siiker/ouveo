@@ -31,7 +31,7 @@ const Sidebar = ({ userInfo }) => {
     { path: "/artisan/dashboard", icon: <FaChartBar />, label: "Tableau de bord" },
     { path: "/artisan/dashboard/services", icon: <FaTools />, label: "Services" },
     {path: "/artisan/mission", icon: <FaFlask/>, label:"Missions"},
-    { path: "/secretary/booking", icon: <FaUserPlus />, label: "Nouvelle réservation" },
+    { path: "/artisan/booking", icon: <FaUserPlus />, label: "Nouvelle réservation" },
     { path: "/artisan/portfolio", icon: <FaBriefcase />, label: "Mon Portfolio" },
     { path: "/profile", icon: <FaUser />, label: "Profil" },
     { path: "/artisan/dashboard/bookings", icon: <FaCalendarCheck />, label: "Historique" },

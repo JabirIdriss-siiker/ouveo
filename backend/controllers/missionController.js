@@ -9,7 +9,6 @@ exports.createMission = async (req, res) => {
     const { bookingId } = req.params;
     const { title, description, workDetails } = req.body;
 
-    // Fetch booking and verify status
     const booking = await Booking.findById(bookingId)
       .populate("serviceId")
       .populate("artisanId");
@@ -54,11 +53,10 @@ exports.getArtisanMissions = async (req, res) => {
     })
       .populate({
         path: "bookingId",
-        match: { status: "accepté" }, // Only include missions with accepted bookings
+        match: { status: "accepté" },
       })
       .sort({ createdAt: -1 });
 
-    // Filter out missions where bookingId is null (due to non-accepted bookings)
     const filteredMissions = missions.filter((mission) => mission.bookingId !== null);
 
     res.json(filteredMissions);
@@ -153,16 +151,19 @@ exports.addPhoto = async (req, res) => {
     if (!req.file) {
       return res.status(400).json({ message: "Aucune photo fournie" });
     }
-
+    
     const photo = {
       url: `uploads/${req.file.filename}`,
       description: req.body.description || "",
+      uploadedAt: new Date()
     };
-
+    
+    
     mission.photos.push(photo);
     await mission.save();
     res.json(mission);
   } catch (error) {
+    console.error("Error adding photo:", error);
     res.status(500).json({ message: "Erreur serveur" });
   }
 };

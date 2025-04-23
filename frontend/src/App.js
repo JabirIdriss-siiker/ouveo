@@ -23,7 +23,9 @@ import ContentModeration from "./pages/admin/ContentModeration";
 import RevenueTracking from "./pages/admin/RevenueTracking";
 import ClientBookingForm from "./pages/ClientBookingForm";
 import ArtisanMission from "./pages/ArtisanMissions";
+import ArtisanBooking from "./pages/ArtisanBooking";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Categories from "./pages/static/Categories";
 
 const AppContent = () => {
   const location = useLocation();
@@ -31,19 +33,23 @@ const AppContent = () => {
   const isLogin = location.pathname === "/login";
   const isRegister = location.pathname === "/register";
   const isAbout = location.pathname === "/about";
+  const isCategory = location.pathname==="/categories"
   const isDashboard = location.pathname.startsWith("/artisan/") || 
                      location.pathname.startsWith("/admin/") ||
                      location.pathname.startsWith("/secretary");
   const isDashboardServices = location.pathname === "/artisan/portfolio";
   const profile = location.pathname === "/profile";
   const isSecretaryDashboard = location.pathname.startsWith("/secretary/dashboard");
-  
+  const isBookingForm = location.pathname === "/booking";
+
   return (
     <div className="flex flex-col min-h-screen">
       {isHomePage  && <Navbar />}
       { isLogin  && <Navbar />}
       { isRegister && <Navbar />}
       { isAbout && <Navbar />}
+      { isCategory && <Navbar/>}
+      {isBookingForm && <Navbar/>}
       <main className="flex-grow">
         <Routes>
           {/* Public Routes */}
@@ -53,7 +59,8 @@ const AppContent = () => {
           <Route path="/services" element={<Services />} />
           <Route path="/services/artisan/:id" element={<ArtisanServices />} />
           <Route path="/about" element={<About />} />
-
+          <Route path="/categories" element={<Categories />} />
+          
           {/* Protected Artisan Routes */}
           <Route path="/artisan/dashboard" element={
             <ProtectedRoute allowedRoles={['artisan']}>
@@ -78,6 +85,11 @@ const AppContent = () => {
           <Route path="/artisan/mission" element={
             <ProtectedRoute allowedRoles={['artisan']}>
               <ArtisanMission />
+            </ProtectedRoute>
+          } />
+          <Route path="/artisan/booking" element={
+            <ProtectedRoute allowedRoles={['artisan']}>
+              <ArtisanBooking />
             </ProtectedRoute>
           } />
 
@@ -132,9 +144,7 @@ const AppContent = () => {
             </ProtectedRoute>
           } />
           <Route path="/booking" element={
-            
-              <ClientBookingForm />
-            
+            <ClientBookingForm />
           } />
         </Routes>
       </main>
