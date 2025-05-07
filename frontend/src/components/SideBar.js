@@ -11,6 +11,7 @@ import {
   FaTimes,
   FaUserPlus,
   FaFlask,
+  FaFileInvoice
 } from "react-icons/fa";
 import logo from "../assests/logo.png";
 
@@ -30,7 +31,8 @@ const Sidebar = ({ userInfo }) => {
   const menuItems = [
     { path: "/artisan/dashboard", icon: <FaChartBar />, label: "Tableau de bord" },
     { path: "/artisan/dashboard/services", icon: <FaTools />, label: "Services" },
-    {path: "/artisan/mission", icon: <FaFlask/>, label:"Missions"},
+    { path: "/artisan/mission", icon: <FaFlask/>, label: "Missions" },
+    { path: "/artisan/invoices", icon: <FaFileInvoice />, label: "Factures" },
     { path: "/artisan/booking", icon: <FaUserPlus />, label: "Nouvelle réservation" },
     { path: "/artisan/portfolio", icon: <FaBriefcase />, label: "Mon Portfolio" },
     { path: "/profile", icon: <FaUser />, label: "Profil" },

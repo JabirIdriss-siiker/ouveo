@@ -24,6 +24,7 @@ import RevenueTracking from "./pages/admin/RevenueTracking";
 import ClientBookingForm from "./pages/ClientBookingForm";
 import ArtisanMission from "./pages/ArtisanMissions";
 import ArtisanBooking from "./pages/ArtisanBooking";
+import ArtisanInvoices from "./pages/ArtisanInvoices";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Categories from "./pages/static/Categories";
 
@@ -90,6 +91,11 @@ const AppContent = () => {
           <Route path="/artisan/booking" element={
             <ProtectedRoute allowedRoles={['artisan']}>
               <ArtisanBooking />
+            </ProtectedRoute>
+          } />
+          <Route path="/artisan/invoices" element={
+            <ProtectedRoute allowedRoles={['artisan']}>
+              <ArtisanInvoices />
             </ProtectedRoute>
           } />
 

@@ -118,4 +118,92 @@ const getServicesByArtisan = async (req, res) => {
   }
 };
 
-module.exports = { getServices, addService, deleteService, getMyServices, getServicesByArtisan };
+const modifyMyService = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, price, description, category, duration, timeSlots, bufferTime } = req.body;
+
+    // Find the service and verify ownership
+    const service = await Service.findOne({ _id: id, artisanId: req.user.id });
+    if (!service) {
+      return res.status(404).json({ message: "Service non trouvé ou vous n'êtes pas autorisé à le modifier" });
+    }
+
+    // Parse timeSlots if it's a string
+    let parsedTimeSlots = timeSlots;
+    if (typeof timeSlots === "string") {
+      try {
+        parsedTimeSlots = JSON.parse(timeSlots);
+      } catch (error) {
+        return res.status(400).json({ message: "Format des créneaux horaires invalide" });
+      }
+    }
+
+    // Validate timeSlots format
+    if (parsedTimeSlots && (!Array.isArray(parsedTimeSlots) || !parsedTimeSlots.every(slot => 
+      slot.day && slot.startTime && slot.endTime &&
+      /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(slot.startTime) &&
+      /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(slot.endTime)
+    ))) {
+      return res.status(400).json({ message: "Format des créneaux horaires invalide" });
+    }
+
+    // Handle image update
+    let imageUpdate = {};
+    if (req.file) {
+      // Delete old image if it exists
+      if (service.image) {
+        const oldImagePath = path.join(__dirname, "..", service.image);
+        if (fs.existsSync(oldImagePath)) {
+          fs.unlinkSync(oldImagePath);
+        }
+      }
+      imageUpdate = { image: `uploads/${req.file.filename}` };
+    }
+
+    // Update service
+    const updatedService = await Service.findByIdAndUpdate(
+      id,
+      {
+        $set: {
+          ...(title && { title }),
+          ...(price && { price: Number(price) }),
+          ...(description && { description }),
+          ...(category && { category }),
+          ...(duration && { duration: Number(duration) }),
+          ...(parsedTimeSlots && { timeSlots: parsedTimeSlots }),
+          ...(bufferTime !== undefined && { bufferTime: Number(bufferTime) }),
+          ...imageUpdate
+        }
+      },
+      { new: true }
+    );
+
+    res.json(updatedService);
+  } catch (error) {
+    console.error("Erreur lors de la modification du service:", error);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+};
+
+const modifyService = async(req, res) => {
+
+}
+
+const getServiceById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const service = await Service.findById(id);
+    if (!service) {
+      return res.status(404).json({ message: "Service introuvable" });
+    }
+
+    res.json(service);
+  } catch (err) {
+    console.error("Erreur lors de la récupération du service :", err.message);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+};
+
+module.exports = { getServices, addService, deleteService, getMyServices, getServicesByArtisan,getServiceById, modifyMyService};

@@ -189,22 +189,28 @@ const ArtisanMissions = () => {
   };
   const handlePhotoUpload = async (missionId) => {
     if (!photo) return;
-
+  
     const formData = new FormData();
     formData.append("photo", photo);
     formData.append("description", photoDescription);
-
+  
     try {
-      await apiClient.post(`/api/missions/${missionId}/photos`, formData);
+      await apiClient.post(`/api/missions/${missionId}/photos`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
+      });
+  
       fetchMissions();
       setPhoto(null);
       setPhotoDescription("");
       toast.success("Photo ajoutée avec succès");
     } catch (error) {
+      console.error("Photo upload error:", error);
       toast.error("Erreur lors de l'ajout de la photo");
     }
   };
-
+  
   const handleAddComment = async (missionId) => {
     if (!comment.trim()) return;
 
@@ -312,10 +318,7 @@ const ArtisanMissions = () => {
                         <p>
                           <strong>Description:</strong> {mission.description}
                         </p>
-                        <p>
-                          <strong>Service:</strong>{" "}
-                          {mission.bookingId?.serviceId?.title || "N/A"}
-                        </p>
+                       
                       </div>
 
                       <button
@@ -509,7 +512,7 @@ const ArtisanMissions = () => {
                           <strong>Client:</strong> {booking.customerName}
                         </p>
                         <p>
-                          <strong>Adresse:</strong> {booking.customerAddress || "N/A"}
+                          <strong>Adresse:</strong> {booking.clientAddress || "N/A"}
                         </p>
                         <p>
                           <strong>Téléphone:</strong> {booking.customerPhone}

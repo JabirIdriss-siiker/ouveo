@@ -9,6 +9,7 @@ const portfolioRoutes = require("./routes/portfolioRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const messageRoutes = require("./routes/messageRoutes");
 const missionRoutes = require("./routes/missionRoutes");
+const invoiceRoutes = require('./routes/invoiceRoutes');
 const path = require("path");
 
 dotenv.config();
@@ -28,6 +29,7 @@ app.use("/api/portfolio", portfolioRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/missions", missionRoutes);
+app.use("/api/invoices", invoiceRoutes);
 
 // Connect to MongoDB
 require("./config/db");

@@ -53,7 +53,7 @@ exports.getArtisanMissions = async (req, res) => {
     })
       .populate({
         path: "bookingId",
-        match: { status: "accepté" },
+        
       })
       .sort({ createdAt: -1 });
 

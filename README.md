@@ -1,4 +1,4 @@
-# ArtisansConnect
+# Ouveo
 
 A comprehensive MERN stack platform connecting skilled artisans with customers, featuring advanced mission management, portfolio tracking, and real-time communication.
 
