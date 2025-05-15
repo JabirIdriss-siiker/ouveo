@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { ClipLoader } from "react-spinners";
 import { motion } from "framer-motion";
-import { FaCamera, FaComment, FaCheck, FaTools, FaPlus, FaCalendarCheck } from "react-icons/fa";
+import { FaCamera, FaComment, FaCheck, FaTools, FaPlus, FaCalendarCheck, FaLink, FaCopy } from "react-icons/fa";
 import Sidebar from "../components/SideBar";
 import { jwtDecode } from "jwt-decode";
 import apiClient from "../api/apiClient";
@@ -93,10 +93,22 @@ const ArtisanMissions = () => {
   const handleAcceptBooking = async (bookingId) => {
     console.log("Accepting booking with ID:", bookingId);
     try {
+      const selectedBooking = bookings.find((b) => b._id === bookingId);
+
+      if (!selectedBooking) {
+        toast.error("Réservation introuvable dans les données locales.");
+        return;
+      }
+
+      const clientName = selectedBooking.customerName || "Client inconnu";
       const response = await apiClient.post(`/api/bookings/${bookingId}/accept-and-create-mission`, {
-        title: "Nouvelle mission",
+        title: `Mission pour ${clientName}`,
         description: "Mission créée à partir de la réservation",
       });
+      
+      console.log("test " + response.data.validationUrl)
+      
+
       console.log("Success response:", response.data);
       toast.success("Réservation acceptée et mission créée");
       fetchMissions();
@@ -166,6 +178,7 @@ const ArtisanMissions = () => {
       toast.error("Erreur lors de la mise à jour du statut");
     }
   };
+
   const handleRejectBooking = async (bookingId) => {
     console.log("Rejecting booking with ID:", bookingId);
     try {
@@ -187,6 +200,7 @@ const ArtisanMissions = () => {
       }
     }
   };
+
   const handlePhotoUpload = async (missionId) => {
     if (!photo) return;
   
@@ -210,7 +224,7 @@ const ArtisanMissions = () => {
       toast.error("Erreur lors de l'ajout de la photo");
     }
   };
-  
+
   const handleAddComment = async (missionId) => {
     if (!comment.trim()) return;
 
@@ -221,6 +235,15 @@ const ArtisanMissions = () => {
       toast.success("Commentaire ajouté avec succès");
     } catch (error) {
       toast.error("Erreur lors de l'ajout du commentaire");
+    }
+  };
+
+  const copyValidationUrl = async (mission) => {
+    try {
+      await navigator.clipboard.writeText(`${window.location.origin}/mission-validation/${mission.validationToken}`);
+      toast.success("URL de validation copiée !");
+    } catch (error) {
+      toast.error("Erreur lors de la copie de l'URL");
     }
   };
 
@@ -243,7 +266,6 @@ const ArtisanMissions = () => {
             Mes Missions
           </motion.h2>
 
-          {/* Tabs */}
           <div className="flex justify-center mb-6">
             <button
               onClick={() => setActiveTab("missions")}
@@ -267,7 +289,6 @@ const ArtisanMissions = () => {
             </button>
           </div>
 
-          {/* Missions Tab */}
           {activeTab === "missions" && (
             <div>
               {loading.missions ? (
@@ -301,6 +322,8 @@ const ArtisanMissions = () => {
                             ? "En attente"
                             : mission.status === "in_progress"
                             ? "En cours"
+                            : mission.status === "validated"
+                            ? "valider"
                             : "Terminé"}
                         </span>
                       </div>
@@ -318,8 +341,30 @@ const ArtisanMissions = () => {
                         <p>
                           <strong>Description:</strong> {mission.description}
                         </p>
-                       
                       </div>
+
+                      {mission.validationToken && (
+                        <div className="mt-4 p-3 bg-primary/10 rounded-lg">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm font-medium flex items-center">
+                              <FaLink className="mr-2" />
+                              URL de validation
+                            </span>
+                            <button
+                              onClick={() => copyValidationUrl(mission)}
+                              className="text-primary hover:text-primary-dark"
+                              title="Copier l'URL"
+                            >
+                              <FaCopy />
+                            </button>
+                          </div>
+                          {mission.status === "validated" && (
+                            <p className="text-xs text-green-600 mt-2">
+                              ✓ Mission validée le {new Date(mission.validatedAt).toLocaleDateString()}
+                            </p>
+                          )}
+                        </div>
+                      )}
 
                       <button
                         onClick={() => {
@@ -434,10 +479,8 @@ const ArtisanMissions = () => {
             </div>
           )}
 
-          {/* Bookings Tab */}
           {activeTab === "bookings" && (
             <div>
-              {/* Filters */}
               <div className="mb-6 flex gap-4">
                 <div className="flex-1">
                   <label className="block text-sm font-medium mb-1">Statut</label>
@@ -528,21 +571,20 @@ const ArtisanMissions = () => {
                       </div>
 
                       {booking.status === "en attente" && (
-                       <div className="space-y-2">
-                       <button
-                         onClick={() => handleAcceptBooking(booking._id)}
-                         className="btn-primary w-full bg-green-500 hover:bg-green-600"
-                       >
-                         <FaCalendarCheck className="inline mr-2" /> Accepter
-                       </button>
-                       <button
-                         onClick={() => handleRejectBooking(booking._id)}
-                         className="btn-secondary w-full bg-red-500 hover:bg-red-600"
-                       >
-                         Refuser
-                       </button>
-                     </div>
-                        
+                        <div className="space-y-2">
+                          <button
+                            onClick={() => handleAcceptBooking(booking._id)}
+                            className="btn-primary w-full bg-green-500 hover:bg-green-600"
+                          >
+                            <FaCalendarCheck className="inline mr-2" /> Accepter
+                          </button>
+                          <button
+                            onClick={() => handleRejectBooking(booking._id)}
+                            className="btn-secondary w-full bg-red-500 hover:bg-red-600"
+                          >
+                            Refuser
+                          </button>
+                        </div>
                       )}
                     </motion.div>
                   ))}
@@ -551,7 +593,6 @@ const ArtisanMissions = () => {
             </div>
           )}
 
-          {/* Mission Details Form Modal */}
           {showMissionForm && selectedMission && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
               <div className="bg-white p-6 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">

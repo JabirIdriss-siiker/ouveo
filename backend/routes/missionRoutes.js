@@ -9,13 +9,15 @@ const {
   updateMissionStatus,
   addPhoto,
   addComment,
-  deletePhoto
+  deletePhoto,
+  getMissionByToken,
+  validateMission
 } = require("../controllers/missionController");
 const auth = require("../middleware/auth");
 
-// Multer configuration
-const upload = require("../middleware/upload"); // ou le chemin vers ton middleware
+const upload = require("../middleware/upload");
 
+// Routes existantes avec auth
 router.post("/booking/:bookingId", auth, createMission);
 router.get("/artisan", auth, getArtisanMissions);
 router.get("/:id", auth, getMission);
@@ -24,5 +26,9 @@ router.put("/:id/status", auth, updateMissionStatus);
 router.post("/:id/photos", auth, upload.single("photo"), addPhoto);
 router.post("/:id/comments", auth, addComment);
 router.delete("/:id/photos/:photoId", auth, deletePhoto);
+
+// Nouvelles routes publiques pour la validation
+router.get("/validate/:token", getMissionByToken);
+router.post("/validate/:token", validateMission);
 
 module.exports = router;

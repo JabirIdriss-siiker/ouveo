@@ -27,6 +27,7 @@ import ArtisanBooking from "./pages/ArtisanBooking";
 import ArtisanInvoices from "./pages/ArtisanInvoices";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Categories from "./pages/static/Categories";
+import MissionValidation from "./pages/MissionValidation"; // Add this import
 
 const AppContent = () => {
   const location = useLocation();
@@ -61,6 +62,7 @@ const AppContent = () => {
           <Route path="/services/artisan/:id" element={<ArtisanServices />} />
           <Route path="/about" element={<About />} />
           <Route path="/categories" element={<Categories />} />
+          <Route path="/mission-validation/:token" element={<MissionValidation />} /> {/* Add this route */}
           
           {/* Protected Artisan Routes */}
           <Route path="/artisan/dashboard" element={

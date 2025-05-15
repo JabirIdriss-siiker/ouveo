@@ -22,7 +22,9 @@ const UserSchema = new mongoose.Schema({
   revenue: {
     total: { type: Number, default: 0 },
     pending: { type: Number, default: 0 }
-  }
+  },
+  ArtisanSiret : {type: String}
+
 });
 
-module.exports = mongoose.model("User", UserSchema);
+module.exports = mongoose.models.User || mongoose.model("User", UserSchema);

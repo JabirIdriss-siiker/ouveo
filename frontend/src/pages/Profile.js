@@ -13,6 +13,7 @@ const Profile = () => {
     password: "",
     role: "",
     specialty: "",
+    ArtisanSiret: "",
     location: "",
     bio: "",
   });
@@ -26,13 +27,14 @@ const Profile = () => {
       const fetchProfile = async () => {
         try {
           const response = await apiClient.get("/api/auth/me");
-          const { name, email, role, specialty, location, bio, profilePicture } = response.data;
+          const { name, email, role, specialty, location,ArtisanSiret, bio, profilePicture } = response.data;
           setUser({
             name,
             email,
             password: "",
             role,
             specialty: specialty || "",
+            ArtisanSiret: ArtisanSiret || "",
             location: location || "",
             bio: bio || "",
           });
@@ -72,6 +74,8 @@ const Profile = () => {
     if (user.role === "artisan") {
       formData.append("specialty", user.specialty);
       formData.append("location", user.location);
+      formData.append("ArtisanSiret", user.ArtisanSiret);
+
       formData.append("bio", user.bio);
       if (profilePicture) formData.append("profilePicture", profilePicture);
     }
@@ -182,6 +186,16 @@ const Profile = () => {
                     name="location"
                     placeholder="Localisation (ex. Paris, France)"
                     value={user.location}
+                    onChange={handleInputChange}
+                    className="input-modern w-full"
+                  />
+                </div>
+                <div className="form-group">
+                  <input
+                    type="text"
+                    name="ArtisanSiret"
+                    placeholder="Siret"
+                    value={user.ArtisanSiret}
                     onChange={handleInputChange}
                     className="input-modern w-full"
                   />

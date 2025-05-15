@@ -2,6 +2,12 @@ const Mission = require("../models/Mission");
 const Booking = require("../models/Booking");
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
+
+
+const generateValidationToken = () => {
+  return crypto.randomBytes(32).toString('hex');
+};
 
 // Create mission from booking
 exports.createMission = async (req, res) => {
@@ -25,6 +31,8 @@ exports.createMission = async (req, res) => {
       return res.status(403).json({ message: "Non autorisé" });
     }
 
+    const validationToken = generateValidationToken();
+    
     const mission = new Mission({
       bookingId,
       title: title || booking.serviceId.title,
@@ -35,16 +43,60 @@ exports.createMission = async (req, res) => {
       clientPhone: booking.customerPhone,
       startDate: booking.bookingDate,
       workDetails: workDetails || {},
+      validationToken
     });
 
     await mission.save();
-    res.status(201).json(mission);
+    res.status(201).json({
+      mission,
+      validationUrl: `${process.env.FRONTEND_URL}/mission-validation/${validationToken}`
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Erreur serveur" });
   }
 };
 
+// Obtenir une mission par son token de validation
+exports.getMissionByToken = async (req, res) => {
+  try {
+    const { token } = req.params;
+    const mission = await Mission.findOne({ validationToken: token })
+      .populate("artisanId", "name email");
+
+    if (!mission) {
+      return res.status(404).json({ message: "Mission non trouvée" });
+    }
+
+    res.json(mission);
+  } catch (error) {
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+};
+
+// Valider une mission
+exports.validateMission = async (req, res) => {
+  try {
+    const { token } = req.params;
+    const mission = await Mission.findOne({ validationToken: token });
+
+    if (!mission) {
+      return res.status(404).json({ message: "Mission non trouvée" });
+    }
+
+    if (mission.status === "validated") {
+      return res.status(400).json({ message: "Mission déjà validée" });
+    }
+
+    mission.status = "validated";
+    mission.validatedAt = new Date();
+    await mission.save();
+
+    res.json({ message: "Mission validée avec succès", mission });
+  } catch (error) {
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+};
 // Get all missions for an artisan
 exports.getArtisanMissions = async (req, res) => {
   try {

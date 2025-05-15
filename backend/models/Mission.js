@@ -33,7 +33,7 @@ const MissionSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['pending', 'in_progress', 'completed'],
+    enum: ['pending', 'in_progress', 'completed', 'validated'],
     default: 'pending'
   },
   startDate: {
@@ -52,7 +52,7 @@ const MissionSchema = new mongoose.Schema({
     problemDescription: String,
     solutionApplied: String,
     recommendations: String,
-    timeSpent: Number // in minutes
+    timeSpent: Number
   },
   photos: [{
     url: String,
@@ -64,6 +64,13 @@ const MissionSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now },
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" }
   }],
+  validationToken: {
+    type: String,
+    unique: true
+  },
+  validatedAt: {
+    type: Date
+  },
   createdAt: { 
     type: Date, 
     default: Date.now 

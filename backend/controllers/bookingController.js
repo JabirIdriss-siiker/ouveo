@@ -1,6 +1,7 @@
 const Booking = require("../models/Booking");
 const Service = require("../models/Service");
 const Mission = require("../models/Mission");
+const crypto = require("crypto");
 
 const moment = require("moment");
 require("moment/locale/fr");
@@ -116,6 +117,10 @@ exports.createBooking = async (req, res) => {
   }
 };
 
+const generateValidationToken = () => {
+  return crypto.randomBytes(32).toString('hex');
+};
+
 // Accept booking and create mission (preserved from previous fix)
 exports.acceptBookingAndCreateMission = async (req, res) => {
   try {
@@ -145,7 +150,7 @@ exports.acceptBookingAndCreateMission = async (req, res) => {
     // Update booking status to accepté
     booking.status = "accepté";
     await booking.save();
-
+    const validationToken = generateValidationToken();
     // Create mission
     const mission = new Mission({
       bookingId,
@@ -166,14 +171,16 @@ exports.acceptBookingAndCreateMission = async (req, res) => {
       photos: [],
       comments: [],
       status: "pending",
+      validationToken,
       createdAt: new Date(),
     });
 
     await mission.save();
-
     res.status(201).json({
       message: "Réservation acceptée et mission créée",
       mission,
+      
+      validationUrl: `${process.env.FRONTEND_URL}/mission-validation/${validationToken}`
     });
   } catch (error) {
     console.error("Erreur lors de l'acceptation et création de mission:", error);
