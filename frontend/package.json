@@ -30,7 +30,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "eject": "react-scripts eject",
-    "build:css": "tailwindcss -i ./src/style/tailwind.css -o ./src/style/main.css --watch"
+    "build:css": "tailwindcss -i ./src/style/tailwind.css -o ./src/style/main.css --watch", 
+"minify-js": "terser src/index.js -o dist/index.min.js -c -m"
   },
   "eslintConfig": {
     "extends": [

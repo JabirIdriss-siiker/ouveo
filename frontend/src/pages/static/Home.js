@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FaArrowRight, FaPhone, FaTools, FaLock, FaBolt, FaFire, FaHandshake, FaClock, FaCheckCircle } from 'react-icons/fa';
+import HeroSection from '../../components/HeroSection';
 import { Helmet } from 'react-helmet';
 
 const Home = () => {
@@ -69,58 +70,10 @@ const Home = () => {
         <meta name="twitter:image" content="https://images.unsplash.com/photo-1581578735769-4fc270d15f92?q=80&w=2670" />
       </Helmet>
 
+
       {/* Hero Section */}
       {/* Hero Section */}
-<section className="relative h-[550px] py-20 px-4 sm:px-8 flex items-center justify-center">
-  <div className="absolute inset-0">
-    <div
-      className="absolute inset-0 bg-cover bg-center"
-      style={{
-        backgroundImage: `url('https://images.unsplash.com/photo-1621905251918-48416bd8575a?q=80&w=2670&auto=format&fit=crop')`,
-        opacity: 0.5,
-      }}
-    ></div>
-    <div className="absolute inset-0 bg-gradient-to-r from-primary/80 to-blue-700/80"></div>
-  </div>
-  <motion.div
-    initial="hidden"
-    animate="visible"
-    variants={fadeIn}
-    className="relative z-10 container mx-auto text-center"
-  >
-    <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white mb-4 font-rubik-dirt">
-      Ouvéo
-    </h1>
-    <p className="text-lg sm:text-xl md:text-2xl text-white/90 max-w-xl mx-auto mb-6 font-poppins">
-      Plomberie, serrurerie, électricité, chaudières : services artisanaux 24/7. Appelez pour un rendez-vous rapide.
-    </p>
-    <p className="text-2xl sm:text-3xl font-semibold text-white mb-6">
-      <a href="tel:+33123456789" className="hover:underline">+33 1 23 45 67 89</a>
-    </p>
-    <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-6">
-      <button
-        onClick={() => setIsModalOpen(true)}
-        className="btn-primary flex items-center justify-center gap-2 rounded-full px-6 py-3 text-base shadow-md hover:bg-primary-dark hover:scale-105 transition-transform"
-      >
-        Appeler Maintenant <FaPhone className="text-white" />
-      </button>
-      <Link
-        to="/services"
-        className="btn-secondary flex items-center justify-center gap-2 rounded-full px-6 py-3 text-base border-2 border-white hover:bg-white hover:text-primary hover:scale-105 transition-transform"
-      >
-        Nos Services <FaArrowRight className="text-black" />
-      </Link>
-    </div>
-    <div className="flex justify-center gap-6 mt-6 text-white/80 text-sm sm:text-base">
-      <div className="flex items-center gap-2">
-        <FaClock className="text-lg" /> Disponible 24/7
-      </div>
-      <div className="flex items-center gap-2">
-        <FaCheckCircle className="text-lg" /> Artisans Certifiés
-      </div>
-    </div>
-  </motion.div>
-</section>
+<HeroSection />
 
       {/* Sticky Phone Button (Mobile) */}
       <a
@@ -131,39 +84,42 @@ const Home = () => {
       </a>
 
       {/* Value Proposition Section */}
-      <section className="py-20 px-4 sm:px-8 bg-gradient-to-r from-dark to-dark/80">
-        <div className="container mx-auto">
-          <motion.h2
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeIn}
-            className="text-4xl sm:text-5xl font-bold text-primary font-rubik-dirt text-center mb-16"
-          >
-            Une expérience unique
-          </motion.h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            {[
-              { icon: <FaTools className="text-primary" />, title: 'Savoir-Faire', desc: 'Des artisans passionnés au service de vos idées.' },
-              { icon: <FaBolt className="text-primary" />, title: 'Professionnalisme', desc: 'Un service client dédié pour une expérience fluide.' },
-              { icon: <FaHandshake className="text-primary" />, title: 'Confiance', desc: 'Des partenariats locaux, fiables et durables.' },
-            ].map((item, index) => (
-              <motion.div
-                key={index}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                variants={fadeIn}
-                className="flex flex-col items-center text-center"
-              >
-                <div className="text-5xl mb-6 animate-float">{item.icon}</div>
-                <h3 className="text-2xl font-semibold text-white mb-4">{item.title}</h3>
-                <p className="text-white/70 text-lg">{item.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Value Proposition Section */}
+<section className="experience-section py-20 px-4 sm:px-8 bg-gradient-to-r from-gray-800 to-gray-900">
+  <div className="container mx-auto">
+    <motion.h2
+      initial={{ opacity: 0, y: -20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.8, ease: "easeOut" }}
+      className="text-4xl sm:text-5xl font-bold text-[#ff5e57] text-center mb-16 font-rubik-dirt"
+    >
+      Une expérience unique
+    </motion.h2>
+
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+      {[
+        { icon: <FaTools className="text-[#ff5e57]" />, title: 'Savoir-Faire', desc: 'Des artisans passionnés au service de vos idées.' },
+        { icon: <FaBolt className="text-[#ff5e57]" />, title: 'Professionnalisme', desc: 'Un service client dédié pour une expérience fluide.' },
+        { icon: <FaHandshake className="text-[#ff5e57]" />, title: 'Confiance', desc: 'Des partenariats locaux, fiables et durables.' },
+      ].map((item, index) => (
+        <motion.div
+          key={index}
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: index * 0.2, ease: "easeOut" }}
+          className="bg-gray-800 hover:bg-gray-700 p-6 rounded-lg shadow-lg hover:shadow-2xl transition-transform duration-300 transform hover:scale-105 flex flex-col items-center text-center"
+        >
+          <div className="text-5xl mb-4 animate-bounce">{item.icon}</div>
+          <h3 className="text-xl font-semibold text-white mb-2">{item.title}</h3>
+          <p className="text-gray-300 text-sm">{item.desc}</p>
+        </motion.div>
+      ))}
+    </div>
+  </div>
+</section>
+
 
       {/* Services Showcase */}
       <section className="py-20 px-4 sm:px-8 bg-gray-soft">
@@ -215,7 +171,7 @@ const Home = () => {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-20 px-4 sm:px-8 bg-gradient-to-r from-dark to-dark/80">
+      <section className="py-20 px-4 sm:px-8 bg-gradient-to-r from-gray-800 to-gray-900">
         <div className="container mx-auto text-center">
           <motion.h2
             initial="hidden"
