@@ -60,6 +60,8 @@ const getMe = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select("-password");
     if (!user) return res.status(404).json({ message: "Utilisateur non trouvé" });
+    console.log("🚀 getMe raw user:", user);
+
     res.json(user);
   } catch (err) {
     console.error(err.message);
@@ -69,7 +71,7 @@ const getMe = async (req, res) => {
 
 // Update current user's info
 const updateMe = async (req, res) => {
-  const { name, email, password, specialty,ArtisanSiret, location, bio } = req.body;
+  const { name, email, password, specialty,artisanSiret, location, bio } = req.body;
   try {
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: "Utilisateur non trouvé" });
@@ -81,7 +83,7 @@ const updateMe = async (req, res) => {
       user.specialty = specialty || user.specialty;
       user.location = location || user.location;
       user.bio = bio || user.bio;
-      user.ArtisanSiret = ArtisanSiret || user.ArtisanSiret;
+      user.ArtisanSiret = artisanSiret || user.artisanSiret;
       if (req.file) {
         // Delete old image if it exists
         if (user.profilePicture) {
@@ -100,7 +102,7 @@ const updateMe = async (req, res) => {
       specialty: user.specialty,
       location: user.location,
       bio: user.bio,
-      ArtisanSiret : user.ArtisanSiret,
+      artisanSiret : user.artisanSiret,
       profilePicture: user.profilePicture,
     });
   } catch (err) {

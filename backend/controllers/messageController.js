@@ -3,7 +3,7 @@ const Message = require("../models/Message");
 // Create new message
 exports.createMessage = async (req, res) => {
   try {
-    const { name, address, phone, serviceType, preferredTime, reason } = req.body;
+    const { name, address, phone,email, serviceType, preferredTime, reason } = req.body;
 
     // Validate required fields
     if (!name || !address || !phone || !serviceType || !preferredTime || !reason) {
@@ -14,6 +14,7 @@ exports.createMessage = async (req, res) => {
       name,
       address,
       phone,
+      email,
       serviceType,
       preferredTime,
       reason

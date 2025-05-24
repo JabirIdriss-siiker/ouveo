@@ -1,25 +1,40 @@
-// frontend/src/components/BookingForm.jsx
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { ClipLoader } from "react-spinners";
 import apiClient from "../api/apiClient";
 
-const BookingForm = ({ service, onSuccess }) => {
+const BookingForm = ({ service, onSuccess, initialData }) => {
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
+  const [clientAddress, setClientAddress] = useState("");
   const [bookingDate, setBookingDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
+  const [reason, setReason] = useState("");
   const [notes, setNotes] = useState("");
   const [availableSlots, setAvailableSlots] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [clientAddress, setClientAddress] = useState("");
 
   useEffect(() => {
+    if (!initialData) return;
+
+    if (initialData.name) setCustomerName(initialData.name);
+    if (initialData.phone) setCustomerPhone(initialData.phone);
+    if (initialData.address) setClientAddress(initialData.address);
+    if (initialData.email) setCustomerEmail(initialData.email);
+    if (initialData.reason) setReason(initialData.reason);
+
+    if (initialData.preferredTime && !bookingDate) {
+      const [date, time] = initialData.preferredTime.split(" ");
+      setBookingDate(date);
+      setSelectedTime(time);
+      return;
+    }
+
     if (bookingDate) {
       fetchAvailableSlots();
     }
-  }, [bookingDate]);
+  }, [initialData, bookingDate]);
 
   const fetchAvailableSlots = async () => {
     try {
@@ -35,8 +50,15 @@ const BookingForm = ({ service, onSuccess }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!customerName || !customerPhone || !customerEmail || !bookingDate || !selectedTime || !clientAddress) {
-      toast.error("Veuillez remplir tous les champs obligatoires, y compris l'adresse");
+    if (
+      !customerName ||
+      !customerPhone ||
+      !customerEmail ||
+      !clientAddress ||
+      !bookingDate ||
+      !selectedTime
+    ) {
+      toast.error("Veuillez remplir tous les champs obligatoires");
       return;
     }
 
@@ -50,22 +72,19 @@ const BookingForm = ({ service, onSuccess }) => {
       artisanId: service.artisanId,
       bookingDate,
       startTime: selectedTime,
+      reason,
       notes,
     };
-    console.log("Booking payload:", payload); // Log payload for debugging
+
     try {
       await apiClient.post("/api/bookings", payload);
-      toast.success("Réservation créée avec succès!");
+      toast.success("Réservation créée avec succès !");
       onSuccess?.();
       resetForm();
     } catch (error) {
       console.error("Error creating booking:", error.response?.data || error.message);
       const errorMessage = error.response?.data?.message || "Erreur lors de la création de la réservation";
-      if (errorMessage.includes("clientAddress")) {
-        toast.error("L'adresse du client est requise");
-      } else {
-        toast.error(errorMessage);
-      }
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -78,7 +97,9 @@ const BookingForm = ({ service, onSuccess }) => {
     setClientAddress("");
     setBookingDate("");
     setSelectedTime("");
+    setReason("");
     setNotes("");
+    setAvailableSlots([]);
   };
 
   return (
@@ -93,6 +114,7 @@ const BookingForm = ({ service, onSuccess }) => {
           required
         />
       </div>
+
       <div className="form-group">
         <input
           type="tel"
@@ -103,6 +125,7 @@ const BookingForm = ({ service, onSuccess }) => {
           required
         />
       </div>
+
       <div className="form-group">
         <input
           type="email"
@@ -113,6 +136,7 @@ const BookingForm = ({ service, onSuccess }) => {
           required
         />
       </div>
+
       <div className="form-group">
         <input
           type="text"
@@ -123,6 +147,7 @@ const BookingForm = ({ service, onSuccess }) => {
           required
         />
       </div>
+
       <div className="form-group">
         <input
           type="date"
@@ -133,6 +158,7 @@ const BookingForm = ({ service, onSuccess }) => {
           required
         />
       </div>
+
       {bookingDate && (
         <div className="form-group">
           <select
@@ -143,13 +169,24 @@ const BookingForm = ({ service, onSuccess }) => {
           >
             <option value="">Sélectionnez un horaire</option>
             {availableSlots.map((slot) => (
-              <option key={slot} value={slot}>
-                {slot}
-              </option>
+              <option key={slot} value={slot}>{slot}</option>
             ))}
           </select>
         </div>
       )}
+
+      {reason && (
+        <div className="form-group">
+          <label className="block text-sm font-medium mb-1">Motif du client</label>
+          <textarea
+            value={reason}
+            readOnly
+            className="input-modern bg-gray-100"
+            rows="3"
+          />
+        </div>
+      )}
+
       <div className="form-group">
         <textarea
           placeholder="Notes (optionnel)"
@@ -159,6 +196,7 @@ const BookingForm = ({ service, onSuccess }) => {
           rows="3"
         />
       </div>
+
       <button
         type="submit"
         disabled={loading}

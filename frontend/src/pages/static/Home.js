@@ -252,6 +252,199 @@ const Home = () => {
           </div>
         </div>
       </section>
+      <section className="py-20 px-4 sm:px-8 bg-gray-soft">
+  <div className="container mx-auto">
+    <motion.h2
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true }}
+      variants={fadeIn}
+      className="section-title text-center"
+    >
+      Grille tarifaire
+    </motion.h2>
+
+    {/* Grille 1–2–4 colonnes */}
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
+      {/* Serrurerie */}
+      <div>
+        <span className="flex items-center text-indigo-800 font-bold text-xl border-b-2 border-primary pb-2 mb-4 icon-serrurier-orange">
+          Serrurerie
+        </span>
+        <ul className="list-disc list-inside text-base space-y-2 text-dark/70">
+          <li>Ouverture porte simple claquée : 110€ – 135€</li>
+          <li>Clé cassée dans la serrure : à partir de 120€</li>
+          <li>Dégrippage de serrure : 100€ – 180€</li>
+          <li>Installation cylindre simple européen : 110€ – 150€</li>
+          <li>Installation serrure blindée 3 points : 390€ (sur devis)</li>
+          <li>
+            <a
+              href="/prix/serrurier/"
+              className="text-primary underline hover:text-primary-dark"
+            >
+              Grille tarifaire des interventions en serrurerie
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      {/* Plomberie */}
+      <div>
+        <span className="flex items-center text-indigo-800 font-bold text-xl border-b-2 border-primary pb-2 mb-4 icon-plombier-orange">
+          Plomberie
+        </span>
+        <ul className="list-disc list-inside text-base space-y-2 text-dark/70">
+          <li>Débouchage canalisation : 275€ – 390€</li>
+          <li>Fuite d’eau : 149€ – 199€</li>
+          <li>Débouchage de WC : 100€ – 200€</li>
+          <li>Réparation chasse d’eau : 150€ – 250€</li>
+          <li>Recherche de fuite : 120€ – 380€</li>
+          <li>
+            <a
+              href="/prix/plombier/"
+              className="text-primary underline hover:text-primary-dark"
+            >
+              Grille tarifaire des interventions en plomberie
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      {/* Chauffage */}
+      <div>
+        <span className="flex items-center text-indigo-800 font-bold text-xl border-b-2 border-primary pb-2 mb-4 icon-chauffagiste-orange">
+          Chauffage
+        </span>
+        <ul className="list-disc list-inside text-base space-y-2 text-dark/70">
+          <li>Réparation de chaudière : 150€ – 350€</li>
+          <li>Réparation du chauffage : 200€ – 300€</li>
+          <li>Entretien de chaudière : 90€ – 250€</li>
+          <li>Fuite chaudière : 149€ – 200€</li>
+          <li>Réparation ballon d’eau chaude : 150€ – 350€</li>
+          <li>
+            <a
+              href="/prix/chauffagiste/"
+              className="text-primary underline hover:text-primary-dark"
+            >
+              Grille tarifaire des interventions de chauffage
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      {/* Électricité */}
+      <div>
+        <span className="flex items-center text-indigo-800 font-bold text-xl border-b-2 border-primary pb-2 mb-4 icon-electricien-orange">
+          Électricité
+        </span>
+        <ul className="list-disc list-inside text-base space-y-2 text-dark/70">
+          <li>Recherche de panne électrique : 110€ – 135€ TTC</li>
+          <li>Réparation tableau électrique : 150€ – 250€ TTC</li>
+          <li>Réparation de prises : 110€ – 150€ TTC</li>
+          <li>Mise aux normes : devis sur-mesure</li>
+          <li>Réparation radiateur électrique : 200€ – 250€ TTC</li>
+          <li>
+            <a
+              href="/prix/electricien/"
+              className="text-primary underline hover:text-primary-dark"
+            >
+              Grille tarifaire des interventions en électricité
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      {/* Assainissement */}
+      <div>
+        <span className="flex items-center text-indigo-800 font-bold text-xl border-b-2 border-primary pb-2 mb-4 icon-assainissement-orange">
+          Assainissement
+        </span>
+        <ul className="list-disc list-inside text-base space-y-2 text-dark/70">
+          <li>Vidange fosse septique : 250€ – 500€ TTC</li>
+          <li>Entretien canalisation : 250€ – 400€ TTC</li>
+          <li>Pompage bac à graisse : 250€ – 500€ TTC</li>
+          <li>Installation micro-station : à partir de 250€ TTC</li>
+          <li>Mise aux normes fosse : à partir de 250€ TTC</li>
+          <li>
+            <a
+              href="/prix/assainissement/"
+              className="text-primary underline hover:text-primary-dark"
+            >
+              Grille tarifaire des interventions d’assainissement
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      {/* Vitrerie */}
+      <div>
+        <span className="flex items-center text-indigo-800 font-bold text-xl border-b-2 border-primary pb-2 mb-4 icon-vitrier-orange">
+          Vitrerie
+        </span>
+        <ul className="list-disc list-inside text-base space-y-2 text-dark/70">
+          <li>Changement vitre double vitrage : 250€ – 500€ TTC</li>
+          <li>Installation crémone fenêtre : 150€ – 250€ TTC</li>
+          <li>Réparation fenêtre : 120€ – 210€</li>
+          <li>Changement vitrine magasin : dès 2 900€ TTC</li>
+          <li>Pose fenêtre bois : 650€ – 1 000€ TTC</li>
+          <li>
+            <a
+              href="/prix/vitrier/"
+              className="text-primary underline hover:text-primary-dark"
+            >
+              Grille tarifaire des interventions en vitrerie
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      {/* Nuisibles */}
+      <div>
+        <span className="flex items-center text-indigo-800 font-bold text-xl border-b-2 border-primary pb-2 mb-4 icon-desinfection-orange">
+          Traitement des nuisibles
+        </span>
+        <ul className="list-disc list-inside text-base space-y-2 text-dark/70">
+          <li>Désinsectisation punaises de lit : 200€ – 400€</li>
+          <li>Dératisation : 200€ – 600€ TTC</li>
+          <li>Désinsectisation blattes : 200€ – 600€ TTC</li>
+          <li>Désinsectisation cafards : 200€ – 600€ TTC</li>
+          <li>Désinsectisation guêpes : 200€ – 600€ TTC</li>
+          <li>
+            <a
+              href="/prix/deratisation/"
+              className="text-primary underline hover:text-primary-dark"
+            >
+              Grille tarifaire des interventions anti-nuisible
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      {/* Travaux & bricolage */}
+      <div>
+        <span className="flex items-center text-indigo-800 font-bold text-xl border-b-2 border-primary pb-2 mb-4 icon-travaux-orange">
+          Travaux & bricolage
+        </span>
+        <ul className="list-disc list-inside text-base space-y-2 text-dark/70">
+          <li>Démontage lit : 50€ – 300€ TTC</li>
+          <li>Peinture plafond : 20€ – 30€ TTC / m²</li>
+          <li>Pose carrelage : 30€ – 50€ TTC / m²</li>
+          <li>Pose sol stratifié : 30€ – 50€ / m²</li>
+          <li>Parquet flottant : 30€ – 60€ / m²</li>
+          <li>
+            <a
+              href="/prix/travaux/"
+              className="text-primary underline hover:text-primary-dark"
+            >
+              Grille tarifaire des interventions en petit travaux
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
 
       {/* Call to Action Section */}
       <section className="py-20 px-4 sm:px-8 bg-white">

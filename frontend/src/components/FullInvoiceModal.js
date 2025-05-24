@@ -63,9 +63,9 @@ const FullInvoiceModal = ({ invoiceId, isOpen, onClose }) => {
               </Section>
 
               <Section title="Mission">
-                <p>{invoice.missionId?.title || "Titre indisponible"}</p>
-                <p>{invoice.missionId?.description || "Description non fournie"}</p>
-              </Section>
+               <p><strong>Titre :</strong> {invoice.missionId?.title || "Titre indisponible"}</p>
+               <p><strong>Raison :</strong> {invoice.missionId?.bookingId?.reason || "Aucune raison fournie"}</p>
+             </Section>
 
               {invoice.missionId?.bookingId && (
                 <Section title="Réservation">

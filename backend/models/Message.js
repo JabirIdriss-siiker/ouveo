@@ -17,6 +17,9 @@ const MessageSchema = new mongoose.Schema({
     type: String, 
     required: true 
   },
+  email: {
+    type : String
+  },
   preferredTime: { 
     type: String, 
     required: true 

@@ -28,7 +28,7 @@ import ArtisanInvoices from "./pages/ArtisanInvoices";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Categories from "./pages/static/Categories";
 import MissionValidation from "./pages/MissionValidation"; // Add this import
-
+import SecretaryBookingDirect from "./pages/secretary/SecretaryBookingDirect"
 const AppContent = () => {
   const location = useLocation();
   const isHomePage = location.pathname === "/";
@@ -110,6 +110,11 @@ const AppContent = () => {
           <Route path="/secretary/booking" element={
             <ProtectedRoute allowedRoles={['secretary']}>
               <SecretaryBooking />
+            </ProtectedRoute>
+          } />
+          <Route path="/secretary/direct" element={
+            <ProtectedRoute allowedRoles={['secretary']}>
+              <SecretaryBookingDirect />
             </ProtectedRoute>
           } />
           <Route path="/secretary/messages" element={

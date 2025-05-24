@@ -23,7 +23,7 @@ const UserSchema = new mongoose.Schema({
     total: { type: Number, default: 0 },
     pending: { type: Number, default: 0 }
   },
-  ArtisanSiret : {type: String}
+  artisanSiret : {type: String}
 
 });
 

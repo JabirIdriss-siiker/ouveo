@@ -14,12 +14,23 @@ const Navbar = () => {
   const location = useLocation();
 
   useEffect(() => {
-    if (token) {
+  if (token) {
+    try {
       const decoded = jwtDecode(token);
-      setRole(decoded.user.role);
-      setUserInfo({ name: decoded.user.name, email: decoded.user.email });
+      if (decoded?.user?.role && decoded?.user?.name && decoded?.user?.email) {
+        setRole(decoded.user.role);
+        setUserInfo({ name: decoded.user.name, email: decoded.user.email });
+      } else {
+        console.warn("Token decoded but missing user info");
+        handleLogout(); // force logout if token is malformed
+      }
+    } catch (error) {
+      console.error("Invalid token", error);
+      handleLogout(); // remove corrupted token
     }
-  }, [token]);
+  }
+}, [token]);
+
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -87,14 +98,11 @@ const Navbar = () => {
                   </button>
                 </div>
               ) : (
-                <>
+                
                   <Link to="/login" className="nav-link font-medium">
                     Connexion
                   </Link>
-                  <Link to="/register" className="btn-primary">
-                    Inscription
-                  </Link>
-                </>
+                  
               )}
             </div>
           </div>

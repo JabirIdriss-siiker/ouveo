@@ -4,19 +4,28 @@ const Mission = require("../models/Mission");
 // Generate invoice number
 const generateInvoiceNumber = async () => {
   const date = new Date();
-  const year = date.getFullYear().toString().slice(-2);
+  const year  = date.getFullYear().toString().slice(-2);
   const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const prefix = `INV-${year}${month}-`;
 
-  const count = await Invoice.countDocuments({
-    createdAt: {
-      $gte: new Date(date.getFullYear(), date.getMonth(), 1),
-      $lt: new Date(date.getFullYear(), date.getMonth() + 1, 1)
-    }
-  });
+  // 1) Trouver la facture du mois avec la séquence la plus élevée
+  const latest = await Invoice
+    .find({ invoiceNumber: { $regex: `^${prefix}\\d{4}$` } })
+    .sort({ invoiceNumber: -1 })   // trie décroissant
+    .limit(1)
+    .lean();
 
-  return `INV-${year}${month}-${(count + 1).toString().padStart(4, '0')}`;
+  let nextSeq = 1;
+  if (latest.length) {
+    // on extrait la partie numérique après le dernier tiret
+    const lastSeq = parseInt(latest[0].invoiceNumber.split('-')[2], 10);
+    nextSeq = lastSeq + 1;
+  }
+
+  // 2) Formattage sur 4 chiffres
+  const seqPadded = nextSeq.toString().padStart(4, '0');
+  return `${prefix}${seqPadded}`;
 };
-
 // Create new invoice
 exports.createInvoice = async (req, res) => {
   try {
@@ -30,6 +39,7 @@ exports.createInvoice = async (req, res) => {
       laborCost = 0,
       notes = "",
       dueDate,
+      artisanSiret,
       paymentMethod,
       paymentStatus
     } = req.body;
@@ -49,7 +59,7 @@ exports.createInvoice = async (req, res) => {
     const invoice = new Invoice({
       invoiceNumber: await generateInvoiceNumber(),
       missionId,
-      artisanId: req.user.id,
+      artisanId:   req.user.id, 
       clientName,
       clientAddress,
       clientEmail,
@@ -61,16 +71,20 @@ exports.createInvoice = async (req, res) => {
       total,
       notes,
       dueDate,
+      artisanSiret,
       ...(paymentMethod && { paymentMethod }),
       ...(paymentStatus && { paymentStatus })
+      
     });
 
     await invoice.save();
     res.status(201).json(invoice);
+    
   } catch (error) {
     console.error("Error creating invoice:", error);
     res.status(500).json({ message: "Erreur lors de la création de la facture" });
   }
+  
 };
 
 // Get all invoices for artisan
@@ -90,8 +104,14 @@ exports.getInvoice = async (req, res) => {
   try {
     const invoice = await Invoice.findById(req.params.id)
       .populate('missionId')
-      .populate('artisanId', 'name email');
-
+      .populate('artisanId', 'name email')
+      .populate({
+       path: "missionId",
+       populate: {
+         path: "bookingId",
+         select: "reason"           // on récupère au moins le champ reason
+       }
+     });
     if (!invoice) {
       return res.status(404).json({ message: "Facture non trouvée" });
     }
@@ -151,6 +171,7 @@ exports.updateInvoice = async (req, res) => {
         notes,
         dueDate,
         status,
+        artisanSiret,
         updatedAt: Date.now()
       },
       { new: true }
@@ -190,12 +211,13 @@ exports.updateInvoiceStatus = async (req, res) => {
 exports.deleteInvoice = async (req, res) => {
   try {
     const invoice = await Invoice.findById(req.params.id);
-
+    
     if (!invoice) {
       return res.status(404).json({ message: "Facture non trouvée" });
     }
 
-    if (invoice.artisanId.toString() !== req.user.id) {
+    // Utilisez .equals() pour comparer un ObjectId à une string
+    if (!invoice.artisanId.equals(req.user.id)) {
       return res.status(403).json({ message: "Non autorisé" });
     }
 
@@ -203,9 +225,10 @@ exports.deleteInvoice = async (req, res) => {
       return res.status(400).json({ message: "Seuls les brouillons peuvent être supprimés" });
     }
 
-    await invoice.remove();
-    res.json({ message: "Facture supprimée" });
+    await invoice.deleteOne();
+    return res.json({ message: "Facture supprimée" });
   } catch (error) {
-    res.status(500).json({ message: "Erreur serveur" });
+    
+    return res.status(500).json({ message: "Erreur serveur", error: error.message });
   }
 };

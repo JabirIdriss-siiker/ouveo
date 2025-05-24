@@ -72,6 +72,7 @@ exports.createBooking = async (req, res) => {
       bookingDate,
       startTime,
       notes,
+      reason,
     } = req.body;
 
     // Validate required fields
@@ -101,6 +102,7 @@ exports.createBooking = async (req, res) => {
       startTime,
       endTime,
       notes,
+      reason,
       createdBy: req.user.id,
       status: "en attente",
     });

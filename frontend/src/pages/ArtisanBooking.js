@@ -5,15 +5,16 @@ import { motion } from "framer-motion";
 import Sidebar from "../components/SideBar";
 import { jwtDecode } from "jwt-decode";
 import apiClient from "../api/apiClient";
-import BookingForm from "../components/BookingForm";
-
+import BookingForm from "../components/BookingFormArtisan";
+import { useLocation } from "react-router-dom";
 const ArtisanBooking = () => {
   const [services, setServices] = useState([]);
   const [selectedService, setSelectedService] = useState(null);
   const [loading, setLoading] = useState(true);
   const [userInfo, setUserInfo] = useState(null);
   const token = localStorage.getItem("token");
-
+  const location = useLocation();
+  const initialData = location.state?.initialData;
   useEffect(() => {
     if (token) {
       const decoded = jwtDecode(token);
@@ -26,7 +27,12 @@ const ArtisanBooking = () => {
     setLoading(true);
     try {
       const response = await apiClient.get("/api/services/my-services");
-      setServices(response.data || []);
+       const all = response.data || [];
+       setServices(all);
+      if (initialData?.serviceId) {
+        const svc = all.find(s => s._id === initialData.serviceId);
+        if (svc) setSelectedService(svc);
+      }
     } catch (error) {
       console.error("Error fetching services:", error);
       toast.error("Erreur lors du chargement des services");
@@ -101,6 +107,7 @@ const ArtisanBooking = () => {
               {selectedService && (
                 <BookingForm
                   service={selectedService}
+                  initialData={initialData}
                   onSuccess={() => {
                     toast.success("Réservation créée avec succès");
                     setSelectedService(null);

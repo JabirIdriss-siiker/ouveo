@@ -101,8 +101,9 @@ const ArtisanMissions = () => {
       }
 
       const clientName = selectedBooking.customerName || "Client inconnu";
+      const bookingDate = selectedBooking.bookingDate.split("T")[0] + ' à ' +  selectedBooking.startTime
       const response = await apiClient.post(`/api/bookings/${bookingId}/accept-and-create-mission`, {
-        title: `Mission pour ${clientName}`,
+        title: `Mission pour ${clientName} / ${bookingDate}`,
         description: "Mission créée à partir de la réservation",
       });
       
@@ -299,7 +300,7 @@ const ArtisanMissions = () => {
                 <p className="text-center text-dark/70">Aucune mission en cours</p>
               ) : (
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                  {missions.map((mission) => (
+                  {missions.map((mission)  => (
                     <motion.div
                       key={mission._id}
                       initial="hidden"
@@ -339,7 +340,7 @@ const ArtisanMissions = () => {
                           <strong>Téléphone:</strong> {mission.clientPhone}
                         </p>
                         <p>
-                          <strong>Description:</strong> {mission.description}
+                          <strong>Description:</strong> {mission.bookingId?.reason}
                         </p>
                       </div>
 
@@ -567,6 +568,9 @@ const ArtisanMissions = () => {
                         </p>
                         <p>
                           <strong>Notes:</strong> {booking.notes || "Aucune"}
+                        </p>
+                         <p>
+                          <strong>Raison:</strong> {booking.reason || "Aucune"}
                         </p>
                       </div>
 

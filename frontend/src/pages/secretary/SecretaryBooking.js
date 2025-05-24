@@ -6,6 +6,7 @@ import SecretarySidebar from "../../components/secretary/SecretraySidebar";
 import { jwtDecode } from "jwt-decode";
 import apiClient from "../../api/apiClient";
 import BookingForm from "../../components/BookingForm";
+import { useLocation } from "react-router-dom"; // ← à ajouter
 
 const SecretaryBooking = () => {
   const [services, setServices] = useState([]);
@@ -13,7 +14,8 @@ const SecretaryBooking = () => {
   const [loading, setLoading] = useState(true);
   const [userInfo, setUserInfo] = useState(null);
   const token = localStorage.getItem("token");
-
+  const location = useLocation();
+  const initialData = location.state?.initialData;
   useEffect(() => {
     if (token) {
       const decoded = jwtDecode(token);
@@ -28,8 +30,7 @@ const SecretaryBooking = () => {
       const response = await apiClient.get("/api/services");
       setServices(response.data || []);
     } catch (error) {
-      console.error("Error fetching services:", error);
-      toast.error("Erreur lors du chargement des services");
+      
     } finally {
       setLoading(false);
     }
@@ -83,15 +84,16 @@ const SecretaryBooking = () => {
                 </select>
               </div>
 
-              {selectedService && (
+              
                 <BookingForm
                   service={selectedService}
                   onSuccess={() => {
                     toast.success("Réservation créée avec succès");
                     setSelectedService(null);
                   }}
+                  initialData={initialData}
                 />
-              )}
+              
             </motion.div>
           )}
         </div>

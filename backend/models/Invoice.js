@@ -79,7 +79,8 @@ const InvoiceSchema = new mongoose.Schema({
   updatedAt: {
     type: Date,
     default: Date.now
-  }
+  },
+  artisanSiret: { type: String, required: true },
 });
 
 module.exports = mongoose.model("Invoice", InvoiceSchema);

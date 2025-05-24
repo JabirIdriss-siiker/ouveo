@@ -105,14 +105,26 @@ const SecretaryDashboard = () => {
     }
   };
 
-  const calendarEvents = bookings.map((booking) => ({
+  const calendarEvents = bookings.map((booking) => {
+  // 1) on crée un Date uniquement à partir de bookingDate
+  const start = new Date(booking.bookingDate);
+  // 2) on parse HH:mm et on fixe l’heure / minute
+  const [hStart, mStart] = booking.startTime.split(":").map(Number);
+  start.setHours(hStart, mStart);
+
+  // même pour endTime
+  const end = new Date(booking.bookingDate);
+  const [hEnd, mEnd] = booking.endTime.split(":").map(Number);
+  end.setHours(hEnd, mEnd);
+
+  return {
     id: booking._id,
-    title: `${booking.customerName} - ${booking.serviceId?.title || "Service non spécifié"} (${booking.artisanId?.name || "Artisan inconnu"})`,
-    start: new Date(`${booking.bookingDate}T${booking.startTime}`),
-    end: new Date(`${booking.bookingDate}T${booking.endTime}`),
+    title: `${booking.customerName} – ${booking.serviceId?.title}`,
+    start,
+    end,
     resource: booking,
-    className: `status-${booking.status}`,
-  }));
+  };
+});
 
   const handleEventClick = (event) => {
     setSelectedEvent(event.resource);

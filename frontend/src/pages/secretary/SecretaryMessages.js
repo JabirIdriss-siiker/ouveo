@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import SecretarySidebar from "../../components/secretary/SecretraySidebar";
 import { jwtDecode } from "jwt-decode";
 import apiClient from "../../api/apiClient";
+import { useNavigate } from "react-router-dom";
 
 const SecretaryMessages = () => {
   const [messages, setMessages] = useState([]);
@@ -12,6 +13,7 @@ const SecretaryMessages = () => {
   const [userInfo, setUserInfo] = useState(null);
   const [filter, setFilter] = useState("new");
   const token = localStorage.getItem("token");
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (token) {
@@ -119,6 +121,7 @@ const SecretaryMessages = () => {
                     <p><strong>Service:</strong> {message.serviceType}</p>
                     <p><strong>Téléphone:</strong> {message.phone}</p>
                     <p><strong>Adresse:</strong> {message.address}</p>
+                    <p><strong>email:</strong> {message.email}</p>
                     <p><strong>Horaire préféré:</strong> {message.preferredTime}</p>
                     <p><strong>Message:</strong> {message.reason}</p>
                     <p className="text-sm">
@@ -142,6 +145,14 @@ const SecretaryMessages = () => {
                         Marquer comme résolu
                       </button>
                     )}
+                    <button
+            className="btn-secondary w-full mt-2"
+            onClick={() =>
+              navigate("/secretary/booking", { state: { initialData: message } })
+            }
+          >
+            Créer un RDV
+          </button>
                   </div>
                 </motion.div>
               ))}

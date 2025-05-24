@@ -21,7 +21,7 @@ const SecretarySidebar = ({ userInfo }) => {
 
   const menuItems = [
     { path: "/secretary/dashboard", icon: <FaCalendarAlt />, label: "Calendrier" },
-    { path: "/secretary/booking", icon: <FaUserPlus />, label: "Nouvelle réservation" },
+    { path: "/secretary/direct", icon: <FaUserPlus />, label: "Nouvelle réservation" },
     { path: "/secretary/messages", icon: <FaEnvelope />, label: "Messages" },
   ];
 

@@ -11,6 +11,7 @@ const bookingSchema = new mongoose.Schema({
   bookingDate: { type: Date, required: true },
   startTime: { type: String, required: true },
   endTime: { type: String, required: true },
+  reason :{ type: String},
   notes: { type: String },
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   createdAt: { type: Date, default: Date.now },

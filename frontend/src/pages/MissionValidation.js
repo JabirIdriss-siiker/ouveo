@@ -66,9 +66,12 @@ const MissionValidation = () => {
           
           <div className="space-y-4 mb-8">
             <div>
-              <h2 className="text-xl font-semibold mb-2">Détails de la mission</h2>
-              <p className="text-dark/70">{mission.description}</p>
-            </div>
+  <h2 className="text-xl font-semibold mb-2">Détails de la mission</h2>
+  <p><strong>Problème :</strong> {mission.workDetails.problemDescription}</p>
+  <p><strong>Solution :</strong> {mission.workDetails.solutionApplied}</p>
+  <p><strong>Recommandations :</strong> {mission.workDetails.recommendations}</p>
+  <p><strong>Temps passé :</strong> {mission.workDetails.timeSpent}</p>
+</div>
 
             <div>
               <h3 className="font-semibold mb-2">Artisan</h3>
