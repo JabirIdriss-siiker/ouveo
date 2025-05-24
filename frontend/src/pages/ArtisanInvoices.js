@@ -119,18 +119,19 @@ const ArtisanInvoices = () => {
     }
   };
 
-  const handleUpdateInvoice = async (invoiceId) => {
-    e.preventDefault();
-    try {
-      const res = await apiClient.put(`/api/invoices/${invoiceId}`, formData);
-      setInvoices(invoices.map(inv => inv._id === invoiceId ? res.data : inv));
-      setShowInvoiceForm(false);
-      resetForm();
-      toast.success("Facture mise à jour avec succès");
-    } catch (error) {
-      toast.error("Erreur lors de la mise à jour de la facture");
-    }
-  };
+  const handleUpdateInvoice = async (e, invoiceId) => {
+   e.preventDefault();
+   try {
+     const res = await apiClient.put(`/api/invoices/${invoiceId}`, formData);
+     setInvoices(invoices.map(inv => inv._id === invoiceId ? res.data : inv));
+     setShowInvoiceForm(false);
+     resetForm();
+     toast.success("Facture mise à jour avec succès");
+   } catch (error) {
+     console.error(error);
+     toast.error("Erreur lors de la mise à jour de la facture");
+   }
+ };
 
   const handleDeleteInvoice = async (invoiceId) => {
     if (!window.confirm("Êtes-vous sûr de vouloir supprimer cette facture ?")) return;
@@ -203,7 +204,7 @@ const ArtisanInvoices = () => {
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
               <div className="bg-white p-6 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                 <h2 className="text-xl font-bold mb-4">{selectedInvoice ? 'Modifier la facture' : 'Nouvelle facture'}</h2>
-                <form onSubmit={selectedInvoice ? handleUpdateInvoice : handleCreateInvoice}>
+                <form onSubmit={e => selectedInvoice ? handleUpdateInvoice(e, selectedInvoice._id) : handleCreateInvoice(e)}>
                   <div className="space-y-4">
                     {/* Mission selector */}
                     <div>
