@@ -214,238 +214,208 @@ const Home = () => {
         </div>
       </section>
 
-      {/* How It Works Section */}
       <section className="py-20 px-4 sm:px-8 bg-gradient-to-r from-dark to-dark/80">
-        <div className="container mx-auto text-center">
-          <motion.h2
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeIn}
-            className="section-title text-center font-rubik-dirt text-primary text-light"
-          >
-            Comment ça marche ?
-          </motion.h2>
-          <div className="mt-12 max-w-4xl mx-auto space-y-12">
-            {[
-              { step: 'Appelez', desc: 'Contactez notre équipe au +33 1 23 45 67 89 pour discuter de votre projet.' },
-              { step: 'Planifiez', desc: 'Notre secrétaire fixe un rendez-vous avec un artisan qualifié.' },
-              { step: 'Réalisez', desc: 'Votre projet prend vie avec un savoir-faire exceptionnel.' },
-            ].map((item, index) => (
-              <motion.div
-                key={index}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                variants={fadeIn}
-                className="p-8 flex items-center justify-between"
-              >
-                <div className="text-left">
-                  <h3 className="text-2xl font-semibold text-light mb-2">{item.step}</h3>
-                  <p className="text-light/80">{item.desc}</p>
-                </div>
-                <span className="bg-primary text-light w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold shrink-0">
-                  {index + 1}
-                </span>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-      <section className="py-20 px-4 sm:px-8 bg-gray-soft">
   <div className="container mx-auto">
-    <motion.h2
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true }}
-      variants={fadeIn}
-      className="section-title text-center"
-    >
-      Grille tarifaire
-    </motion.h2>
+    {/* Titre */}
+    <h2 className="text-4xl sm:text-5xl font-bold text-center mb-4 text-white font-rubik-dirt">
+      Comment ça marche ?
+    </h2>
+    <p className="text-center text-white/70 mb-16 text-base sm:text-lg">
+      Un processus simple, rapide et efficace pour vous accompagner
+    </p>
 
-    {/* Grille 1–2–4 colonnes */}
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
-      {/* Serrurerie */}
-      <div>
-        <span className="flex items-center text-indigo-800 font-bold text-xl border-b-2 border-primary pb-2 mb-4 icon-serrurier-orange">
-          Serrurerie
-        </span>
-        <ul className="list-disc list-inside text-base space-y-2 text-dark/70">
-          <li>Ouverture porte simple claquée : 110€ – 135€</li>
-          <li>Clé cassée dans la serrure : à partir de 120€</li>
-          <li>Dégrippage de serrure : 100€ – 180€</li>
-          <li>Installation cylindre simple européen : 110€ – 150€</li>
-          <li>Installation serrure blindée 3 points : 390€ (sur devis)</li>
-          <li>
-            <a
-              href="/prix/serrurier/"
-              className="text-primary underline hover:text-primary-dark"
-            >
-              Grille tarifaire des interventions en serrurerie
-            </a>
-          </li>
-        </ul>
-      </div>
+    <div className="flex flex-col lg:flex-row items-center justify-center gap-6">
+      {[
+        {
+          number: "01",
+          title: "Contact Initial",
+          description:
+            "Appelez-nous ou remplissez le formulaire en ligne pour décrire vos besoins.",
+        },
+        {
+          number: "02",
+          title: "Devis Gratuit",
+          description:
+            "Recevez immédiatement un devis clair et adapté, sans engagement.",
+        },
+        {
+          number: "03",
+          title: "Planification",
+          description:
+            "Nous fixons un rendez-vous selon vos disponibilités, même en urgence.",
+        },
+        {
+          number: "04",
+          title: "Intervention",
+          description:
+            "Nos experts interviennent avec efficacité et professionnalisme.",
+        },
+      ].map((step, index, arr) => (
+        <div key={index} className="flex items-center gap-4">
+          {/* Carte étape */}
+          <div className="bg-white/5 backdrop-blur-md rounded-xl p-6 border border-white/10 w-72 lg:w-64 shadow-md hover:shadow-lg transition">
+            <span className="text-primary text-3xl font-bold">{step.number}</span>
+            <h3 className="text-lg font-semibold text-white mt-2 mb-2">{step.title}</h3>
+            <p className="text-sm text-white/80">{step.description}</p>
+          </div>
 
-      {/* Plomberie */}
-      <div>
-        <span className="flex items-center text-indigo-800 font-bold text-xl border-b-2 border-primary pb-2 mb-4 icon-plombier-orange">
-          Plomberie
-        </span>
-        <ul className="list-disc list-inside text-base space-y-2 text-dark/70">
-          <li>Débouchage canalisation : 275€ – 390€</li>
-          <li>Fuite d’eau : 149€ – 199€</li>
-          <li>Débouchage de WC : 100€ – 200€</li>
-          <li>Réparation chasse d’eau : 150€ – 250€</li>
-          <li>Recherche de fuite : 120€ – 380€</li>
-          <li>
-            <a
-              href="/prix/plombier/"
-              className="text-primary underline hover:text-primary-dark"
-            >
-              Grille tarifaire des interventions en plomberie
-            </a>
-          </li>
-        </ul>
-      </div>
-
-      {/* Chauffage */}
-      <div>
-        <span className="flex items-center text-indigo-800 font-bold text-xl border-b-2 border-primary pb-2 mb-4 icon-chauffagiste-orange">
-          Chauffage
-        </span>
-        <ul className="list-disc list-inside text-base space-y-2 text-dark/70">
-          <li>Réparation de chaudière : 150€ – 350€</li>
-          <li>Réparation du chauffage : 200€ – 300€</li>
-          <li>Entretien de chaudière : 90€ – 250€</li>
-          <li>Fuite chaudière : 149€ – 200€</li>
-          <li>Réparation ballon d’eau chaude : 150€ – 350€</li>
-          <li>
-            <a
-              href="/prix/chauffagiste/"
-              className="text-primary underline hover:text-primary-dark"
-            >
-              Grille tarifaire des interventions de chauffage
-            </a>
-          </li>
-        </ul>
-      </div>
-
-      {/* Électricité */}
-      <div>
-        <span className="flex items-center text-indigo-800 font-bold text-xl border-b-2 border-primary pb-2 mb-4 icon-electricien-orange">
-          Électricité
-        </span>
-        <ul className="list-disc list-inside text-base space-y-2 text-dark/70">
-          <li>Recherche de panne électrique : 110€ – 135€ TTC</li>
-          <li>Réparation tableau électrique : 150€ – 250€ TTC</li>
-          <li>Réparation de prises : 110€ – 150€ TTC</li>
-          <li>Mise aux normes : devis sur-mesure</li>
-          <li>Réparation radiateur électrique : 200€ – 250€ TTC</li>
-          <li>
-            <a
-              href="/prix/electricien/"
-              className="text-primary underline hover:text-primary-dark"
-            >
-              Grille tarifaire des interventions en électricité
-            </a>
-          </li>
-        </ul>
-      </div>
-
-      {/* Assainissement */}
-      <div>
-        <span className="flex items-center text-indigo-800 font-bold text-xl border-b-2 border-primary pb-2 mb-4 icon-assainissement-orange">
-          Assainissement
-        </span>
-        <ul className="list-disc list-inside text-base space-y-2 text-dark/70">
-          <li>Vidange fosse septique : 250€ – 500€ TTC</li>
-          <li>Entretien canalisation : 250€ – 400€ TTC</li>
-          <li>Pompage bac à graisse : 250€ – 500€ TTC</li>
-          <li>Installation micro-station : à partir de 250€ TTC</li>
-          <li>Mise aux normes fosse : à partir de 250€ TTC</li>
-          <li>
-            <a
-              href="/prix/assainissement/"
-              className="text-primary underline hover:text-primary-dark"
-            >
-              Grille tarifaire des interventions d’assainissement
-            </a>
-          </li>
-        </ul>
-      </div>
-
-      {/* Vitrerie */}
-      <div>
-        <span className="flex items-center text-indigo-800 font-bold text-xl border-b-2 border-primary pb-2 mb-4 icon-vitrier-orange">
-          Vitrerie
-        </span>
-        <ul className="list-disc list-inside text-base space-y-2 text-dark/70">
-          <li>Changement vitre double vitrage : 250€ – 500€ TTC</li>
-          <li>Installation crémone fenêtre : 150€ – 250€ TTC</li>
-          <li>Réparation fenêtre : 120€ – 210€</li>
-          <li>Changement vitrine magasin : dès 2 900€ TTC</li>
-          <li>Pose fenêtre bois : 650€ – 1 000€ TTC</li>
-          <li>
-            <a
-              href="/prix/vitrier/"
-              className="text-primary underline hover:text-primary-dark"
-            >
-              Grille tarifaire des interventions en vitrerie
-            </a>
-          </li>
-        </ul>
-      </div>
-
-      {/* Nuisibles */}
-      <div>
-        <span className="flex items-center text-indigo-800 font-bold text-xl border-b-2 border-primary pb-2 mb-4 icon-desinfection-orange">
-          Traitement des nuisibles
-        </span>
-        <ul className="list-disc list-inside text-base space-y-2 text-dark/70">
-          <li>Désinsectisation punaises de lit : 200€ – 400€</li>
-          <li>Dératisation : 200€ – 600€ TTC</li>
-          <li>Désinsectisation blattes : 200€ – 600€ TTC</li>
-          <li>Désinsectisation cafards : 200€ – 600€ TTC</li>
-          <li>Désinsectisation guêpes : 200€ – 600€ TTC</li>
-          <li>
-            <a
-              href="/prix/deratisation/"
-              className="text-primary underline hover:text-primary-dark"
-            >
-              Grille tarifaire des interventions anti-nuisible
-            </a>
-          </li>
-        </ul>
-      </div>
-
-      {/* Travaux & bricolage */}
-      <div>
-        <span className="flex items-center text-indigo-800 font-bold text-xl border-b-2 border-primary pb-2 mb-4 icon-travaux-orange">
-          Travaux & bricolage
-        </span>
-        <ul className="list-disc list-inside text-base space-y-2 text-dark/70">
-          <li>Démontage lit : 50€ – 300€ TTC</li>
-          <li>Peinture plafond : 20€ – 30€ TTC / m²</li>
-          <li>Pose carrelage : 30€ – 50€ TTC / m²</li>
-          <li>Pose sol stratifié : 30€ – 50€ / m²</li>
-          <li>Parquet flottant : 30€ – 60€ / m²</li>
-          <li>
-            <a
-              href="/prix/travaux/"
-              className="text-primary underline hover:text-primary-dark"
-            >
-              Grille tarifaire des interventions en petit travaux
-            </a>
-          </li>
-        </ul>
-      </div>
+          {/* Flèche entre les cartes sauf après la dernière */}
+          {index < arr.length - 1 && (
+            <div className="text-white/40 text-3xl hidden lg:block">›</div>
+          )}
+        </div>
+      ))}
     </div>
   </div>
 </section>
 
 
+  <section className="py-20 px-4 sm:px-8 bg-gray-50">
+   <div className="container mx-auto">
+    <motion.h2
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true }}
+      variants={fadeIn}
+      className="text-3xl font-bold text-center text-gray-900 mb-12"
+    >
+      Grille tarifaire
+    </motion.h2>
+
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+      {[
+        {
+          title: 'Serrurerie',
+          iconClass: 'icon-serrurier-orange',
+          link: '/prix/serrurier/',
+          items: [
+            'Ouverture porte simple claquée : 110€ – 135€',
+            'Clé cassée dans la serrure : à partir de 120€',
+            'Dégrippage de serrure : 100€ – 180€',
+            'Installation cylindre simple européen : 110€ – 150€',
+            'Installation serrure blindée 3 points : 390€ (sur devis)'
+          ]
+        },
+        {
+          title: 'Plomberie',
+          iconClass: 'icon-plombier-orange',
+          link: '/prix/plombier/',
+          items: [
+            'Débouchage canalisation : 275€ – 390€',
+            'Fuite d’eau : 149€ – 199€',
+            'Débouchage de WC : 100€ – 200€',
+            'Réparation chasse d’eau : 150€ – 250€',
+            'Recherche de fuite : 120€ – 380€'
+          ]
+        },
+        {
+          title: 'Chauffage',
+          iconClass: 'icon-chauffagiste-orange',
+          link: '/prix/chauffagiste/',
+          items: [
+            'Réparation de chaudière : 150€ – 350€',
+            'Réparation du chauffage : 200€ – 300€',
+            'Entretien de chaudière : 90€ – 250€',
+            'Fuite chaudière : 149€ – 200€',
+            'Réparation ballon d’eau chaude : 150€ – 350€'
+          ]
+        },
+        {
+          title: 'Électricité',
+          iconClass: 'icon-electricien-orange',
+          link: '/prix/electricien/',
+          items: [
+            'Recherche de panne électrique : 110€ – 135€ TTC',
+            'Réparation tableau électrique : 150€ – 250€ TTC',
+            'Réparation de prises : 110€ – 150€ TTC',
+            'Mise aux normes : devis sur-mesure',
+            'Réparation radiateur électrique : 200€ – 250€ TTC'
+          ]
+        }
+      ].map(({ title, iconClass, link, items }, idx) => (
+        <motion.div
+          key={idx}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={fadeIn}
+          className="bg-white rounded-lg shadow-md hover:shadow-xl transition p-6 flex flex-col"
+        >
+          <h3 className={`text-xl font-semibold text-primary border-b-2 border-primary pb-2 mb-4 ${iconClass}`}>
+            {title}
+          </h3>
+          <ul className="flex-1 list-disc list-inside space-y-2 text-gray-700 mb-6 text-sm">
+            {items.map((text, i) => (
+              <li key={i}>{text}</li>
+            ))}
+          </ul>
+          <Link
+            to={link}
+            className="mt-auto inline-flex items-center text-primary font-medium hover:underline"
+          >
+            Voir tous <FaArrowRight className="ml-1" />
+          </Link>
+        </motion.div>
+      ))}
+    </div>
+  </div>
+</section>
+
+
+
+      
+      <section className="py-20 px-4 sm:px-8 bg-gradient-to-r from-dark to-dark/80 text-white">
+        <div className="container mx-auto max-w-4xl">
+          <motion.h2
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={{
+              hidden: { opacity: 0, y: 20 },
+              visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+            }}
+            className="text-4xl sm:text-5xl font-bold text-center mb-12 font-rubik-dirt text-primary"
+          >
+            Questions fréquentes
+          </motion.h2>
+
+          <div className="space-y-6">
+            {[
+              {
+                question: "Quels sont vos délais d’intervention ?",
+                answer:
+                  "Nos artisans interviennent en moyenne en 45 minutes pour les urgences. Vous pouvez aussi planifier un rendez-vous à l’avance selon vos disponibilités.",
+              },
+              {
+                question: "Comment obtenir un devis ?",
+                answer:
+                  "Vous pouvez obtenir un devis immédiatement en ligne ou en appelant notre service client. Nos tarifs sont transparents et sans frais cachés.",
+              },
+              {
+                question: "L’annulation est-elle gratuite ?",
+                answer:
+                  "Oui, vous pouvez annuler votre intervention gratuitement jusqu’à 48h avant le rendez-vous.",
+              },
+              {
+                question: "Quels types de paiements acceptez-vous ?",
+                answer:
+                  "Nous acceptons les paiements par carte bancaire, PayPal, virement bancaire et espèces à la fin des travaux.",
+              },
+            ].map((item, index) => (
+              <details
+                key={index}
+                className="bg-dark/60 backdrop-blur-md border border-primary/40 rounded-xl p-6 group transition duration-300 hover:shadow-lg"
+              >
+                <summary className="cursor-pointer font-semibold text-lg flex justify-between items-center text-white">
+                  {item.question}
+                  <span className="text-primary transition-transform group-open:rotate-180">▼</span>
+                </summary>
+                <p className="mt-3 text-gray-300 text-sm leading-relaxed">{item.answer}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
       {/* Call to Action Section */}
       <section className="py-20 px-4 sm:px-8 bg-white">
         <motion.div

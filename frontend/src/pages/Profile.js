@@ -13,7 +13,7 @@ const Profile = () => {
     password: "",
     role: "",
     specialty: "",
-    ArtisanSiret: "",
+    artisanSiret: "",
     location: "",
     bio: "",
   });
@@ -27,14 +27,14 @@ const Profile = () => {
       const fetchProfile = async () => {
         try {
           const response = await apiClient.get("/api/auth/me");
-          const { name, email, role, specialty, location,ArtisanSiret, bio, profilePicture } = response.data;
+          const { name, email, role, specialty, location,artisanSiret, bio, profilePicture } = response.data;
           setUser({
             name,
             email,
             password: "",
             role,
             specialty: specialty || "",
-            ArtisanSiret: ArtisanSiret || "",
+            artisanSiret: artisanSiret || "",
             location: location || "",
             bio: bio || "",
           });
@@ -195,7 +195,7 @@ const Profile = () => {
                     type="text"
                     name="ArtisanSiret"
                     placeholder="Siret"
-                    value={user.ArtisanSiret}
+                    value={user.artisanSiret}
                     onChange={handleInputChange}
                     className="input-modern w-full"
                   />
